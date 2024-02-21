@@ -1,0 +1,22 @@
+@startgantt
+
+[Software Design] requires 3 days
+[Patient List Feature] requires 7 days
+[Patient Details Feature] requires 14 days
+[QR Code Feature] requires 5 days
+[Platform Adjustments] requires 3 days
+
+Project starts 2024-02-17
+
+[Software Design] starts D+0
+[Patient List Feature] starts D+3
+[Patient List Feature] starts at [Software Design]'s end
+[Patient Details Feature] starts D+10
+[Patient Details Feature] starts at [Patient List Feature]'s end
+[QR Code Feature] starts D+24
+[QR Code Feature] starts at [Patient Details Feature]'s end
+
+[Platform Adjustments] starts at D+29
+
+
+@endgantt
