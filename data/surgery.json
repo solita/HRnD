@@ -1,0 +1,142 @@
+[
+    {
+      "patient_id": "1",
+      "surgery_name": "Knee Replacement",
+      "surgery_date": "11/12/2001",
+      "surgery_outcome": "successful",
+      "surgery_description": "Consectetur adipiscing elit"
+    },
+    {
+      "patient_id": "2",
+      "surgery_name": "Hip Arthroscopy",
+      "surgery_date": "8/3/2008",
+      "surgery_outcome": "complications",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "3",
+      "surgery_name": "Tonsillectomy",
+      "surgery_date": "6/20/2013",
+      "surgery_outcome": "successful",
+      "surgery_description": "Laboris nisi ut aliquip ex ea commodo consequat"
+    },
+    {
+      "patient_id": "4",
+      "surgery_name": "Gallbladder Removal",
+      "surgery_date": "7/3/2004",
+      "surgery_outcome": "complications",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "5",
+      "surgery_name": "Cataract Surgery",
+      "surgery_date": "5/21/2019",
+      "surgery_outcome": "successful",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "6",
+      "surgery_name": "Gallbladder Removal",
+      "surgery_date": "4/29/2007",
+      "surgery_outcome": "complications",
+      "surgery_description": "Duis aute irure dolor in reprehenderit"
+    },
+    {
+      "patient_id": "7",
+      "surgery_name": "Hip Arthroscopy",
+      "surgery_date": "5/7/2016",
+      "surgery_outcome": "complications",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "8",
+      "surgery_name": "Hip Arthroscopy",
+      "surgery_date": "2/14/2010",
+      "surgery_outcome": "successful",
+      "surgery_description": "Ut enim ad minim veniam"
+    },
+    {
+      "patient_id": "9",
+      "surgery_name": "Hernia Repair",
+      "surgery_date": "8/29/2008",
+      "surgery_outcome": "successful",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "10",
+      "surgery_name": "Liposuction",
+      "surgery_date": "4/18/2014",
+      "surgery_outcome": "successful",
+      "surgery_description": "Quis nostrud exercitation ullamco"
+    },
+    {
+      "patient_id": "11",
+      "surgery_name": "Hernia Repair",
+      "surgery_date": "12/1/2012",
+      "surgery_outcome": "complications",
+      "surgery_description": "Duis aute irure dolor in reprehenderit"
+    },
+    {
+      "patient_id": "12",
+      "surgery_name": "Laser Eye Surgery",
+      "surgery_date": "12/3/2001",
+      "surgery_outcome": "successful",
+      "surgery_description": "Voluptate velit esse cillum dolore"
+    },
+    {
+      "patient_id": "13",
+      "surgery_name": "Cataract Surgery",
+      "surgery_date": "6/28/2016",
+      "surgery_outcome": "failure",
+      "surgery_description": "Ut enim ad minim veniam"
+    },
+    {
+      "patient_id": "14",
+      "surgery_name": "Tonsillectomy",
+      "surgery_date": "10/2/2010",
+      "surgery_outcome": "failure",
+      "surgery_description": "Duis aute irure dolor in reprehenderit"
+    },
+    {
+      "patient_id": "15",
+      "surgery_name": "Hip Arthroscopy",
+      "surgery_date": "8/4/2008",
+      "surgery_outcome": "complications",
+      "surgery_description": "Consectetur adipiscing elit"
+    },
+    {
+      "patient_id": "16",
+      "surgery_name": "Knee Replacement",
+      "surgery_date": "2/5/2015",
+      "surgery_outcome": "complications",
+      "surgery_description": "Ut enim ad minim veniam"
+    },
+    {
+      "patient_id": "17",
+      "surgery_name": "Liposuction",
+      "surgery_date": "10/13/2015",
+      "surgery_outcome": "successful",
+      "surgery_description": "Consectetur adipiscing elit"
+    },
+    {
+      "patient_id": "18",
+      "surgery_name": "Cataract Surgery",
+      "surgery_date": "10/12/2016",
+      "surgery_outcome": "failure",
+      "surgery_description": "Laboris nisi ut aliquip ex ea commodo consequat"
+    },
+    {
+      "patient_id": "19",
+      "surgery_name": "Cataract Surgery",
+      "surgery_date": "11/3/2013",
+      "surgery_outcome": "successful",
+      "surgery_description": "Ut enim ad minim veniam"
+    },
+    {
+      "patient_id": "20",
+      "surgery_name": "Hernia Repair",
+      "surgery_date": "2/23/2016",
+      "surgery_outcome": "complications",
+      "surgery_description": "Consectetur adipiscing elit"
+    }
+  ]
