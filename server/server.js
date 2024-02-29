@@ -62,8 +62,8 @@ app.get("/get_patient_surgeries", (req, res) => {
   res.send(filteredSurgery)
 });
 
-app.listen(8080, () => {
-  console.log("SERVER STARTED\n","Server running at http://localhost:8080/");
+app.listen(8090, () => {
+  console.log("SERVER STARTED\n","Server running at http://localhost:8090/");
 });
 
 app.use(

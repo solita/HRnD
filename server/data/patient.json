@@ -8,7 +8,8 @@
       "blood_type": "A-",
       "height": "100.56",
       "weight": "300.29",
-      "allergies": "Pollen"
+      "allergies": "Pollen",
+      "current_room" : "11"
     },
     {
       "patient_id": "2",
@@ -19,7 +20,8 @@
       "blood_type": "AB+",
       "height": "92.87",
       "weight": "335.35",
-      "allergies": "Peanuts"
+      "allergies": "Peanuts",
+      "current_room" : "11"
     },
     {
       "patient_id": "3",
@@ -30,7 +32,8 @@
       "blood_type": "B+",
       "height": "119.67",
       "weight": "389.3",
-      "allergies": "Peanuts"
+      "allergies": "Peanuts",
+      "current_room" : "12"
     },
     {
       "patient_id": "4",
@@ -41,7 +44,8 @@
       "blood_type": "B+",
       "height": "141.22",
       "weight": "108.65",
-      "allergies": "Pollen"
+      "allergies": "Pollen",
+      "current_room" : "12"
     },
     {
       "patient_id": "5",
@@ -52,7 +56,8 @@
       "blood_type": "A-",
       "height": "214.47",
       "weight": "77.94",
-      "allergies": "Peanuts"
+      "allergies": "Peanuts",
+      "current_room" : "14"
     },
     {
       "patient_id": "6",
@@ -63,7 +68,8 @@
       "blood_type": "AB-",
       "height": "214.46",
       "weight": "329.64",
-      "allergies": "Penicillin"
+      "allergies": "Penicillin",
+      "current_room" : "14"
     },
     {
       "patient_id": "7",
@@ -74,7 +80,8 @@
       "blood_type": "A+",
       "height": "218.84",
       "weight": "334.6",
-      "allergies": "Peanuts"
+      "allergies": "Peanuts",
+      "current_room" : "14"
     },
     {
       "patient_id": "8",
@@ -96,7 +103,8 @@
       "blood_type": "AB-",
       "height": "111.17",
       "weight": "160.81",
-      "allergies": "Dust"
+      "allergies": "Dust",
+      "current_room" : "2"
     },
     {
       "patient_id": "10",
@@ -107,7 +115,8 @@
       "blood_type": "AB-",
       "height": "206.87",
       "weight": "369.02",
-      "allergies": "Dust"
+      "allergies": "Dust",
+      "current_room" : "3"
     },
     {
       "patient_id": "11",
@@ -118,7 +127,8 @@
       "blood_type": "AB+",
       "height": "195.83",
       "weight": "202.73",
-      "allergies": "Pollen"
+      "allergies": "Pollen",
+      "current_room" : "4"
     },
     {
       "patient_id": "12",
@@ -129,7 +139,8 @@
       "blood_type": "O-",
       "height": "56.61",
       "weight": "116.51",
-      "allergies": "Penicillin"
+      "allergies": "Penicillin",
+      "current_room" : "4"
     },
     {
       "patient_id": "13",
@@ -140,7 +151,8 @@
       "blood_type": "B-",
       "height": "162.99",
       "weight": "215.55",
-      "allergies": "Dust"
+      "allergies": "Dust",
+      "current_room" : "14"
     },
     {
       "patient_id": "14",
@@ -151,7 +163,8 @@
       "blood_type": "A-",
       "height": "169.25",
       "weight": "299.57",
-      "allergies": "Penicillin"
+      "allergies": "Penicillin",
+      "current_room" : "14"
     },
     {
       "patient_id": "15",
@@ -162,7 +175,8 @@
       "blood_type": "AB+",
       "height": "80.29",
       "weight": "309.79",
-      "allergies": "Penicillin"
+      "allergies": "Penicillin",
+      "current_room" : null
     },
     {
       "patient_id": "16",
@@ -206,7 +220,8 @@
       "blood_type": "B-",
       "height": "53.06",
       "weight": "128.4",
-      "allergies": "Penicillin"
+      "allergies": "Penicillin",
+      "current_room" : "22"
     },
     {
       "patient_id": "20",

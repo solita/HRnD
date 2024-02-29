@@ -8,11 +8,13 @@ android-targetSdk = "34"
 androidx-activityCompose = "1.8.0"
 jetpack-compose-bom = "2024.01.00"
 koin = "3.5.3"
-kotlin = "1.9.20"
+kotlin = "1.9.22"
 ktor = "2.3.8"
 kamel = "0.9.1"
 voyager = "1.0.0"
 moko-resources = "0.23.0"
+napier = "2.7.1"
+orbit = "6.1.0"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "jetpack-compose-bom" }
@@ -30,6 +32,14 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+orbit-mvi = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
+orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
+
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version = "0.5.0" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotest-assert = { module = "io.kotest:kotest-assertions-core", version = "5.8.0" }
+kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.7"}
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

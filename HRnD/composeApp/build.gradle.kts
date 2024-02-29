@@ -59,12 +59,25 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.koin)
             implementation(libs.moko.resources.compose)
+
+            implementation(libs.napier)
+
+            implementation(libs.orbit.compose)
+
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlin.immutable.collections)
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.kotest.assert)
+            }
         }
     }
 }
 
 android {
-    namespace = "com.jetbrains.kmpapp"
+    namespace = "fi.solita.hrnd"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
@@ -72,7 +85,7 @@ android {
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
-        applicationId = "com.jetbrains.kmpapp"
+        applicationId = "fi.solita.hrnd"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -104,5 +117,5 @@ android {
 }
 
 multiplatformResources {
-    multiplatformResourcesPackage = "com.jetbrains.kmpapp"
+    multiplatformResourcesPackage = "fi.solita.hrnd"
 }
