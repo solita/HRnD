@@ -58,6 +58,7 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.koin)
+            implementation(libs.voyager.transitions)
             implementation(libs.moko.resources.compose)
 
             implementation(libs.napier)
@@ -105,6 +106,28 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            resValue("string", "app_name", "Health Rundown")
+        }
+
+        getByName("debug"){
+            resValue("string", "app_name", "Health Debug")
+        }
+
+        create("demo") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+
+            isDebuggable = false
+            isDefault = false
+
+            signingConfig = signingConfigs.getByName("debug")
+
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "Health Rundown Demo")
         }
     }
     compileOptions {
