@@ -1,10 +1,12 @@
 package fi.solita.hrnd.di
 
-import fi.solita.hrnd.data.HealthRepository
-import fi.solita.hrnd.presentation.screens.list.ListScreenModel
-import fi.solita.hrnd.data.HealthApi
-import fi.solita.hrnd.data.HealthRepositoryImpl
-import fi.solita.hrnd.data.KtorHealthApi
+import fi.solita.hrnd.core.data.HealthRepository
+import fi.solita.hrnd.feature.list.ListScreenModel
+import fi.solita.hrnd.core.data.HealthApi
+import fi.solita.hrnd.core.data.HealthRepositoryImpl
+import fi.solita.hrnd.core.data.KtorHealthApi
+import fi.solita.hrnd.feature.details.DetailsScreenModel
+import fi.solita.hrnd.feature.qr.ScanQRScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
@@ -32,6 +34,8 @@ val dataModule = module {
 
 val screenModelsModule = module {
     factoryOf(::ListScreenModel)
+    factoryOf(::DetailsScreenModel)
+    factoryOf(::ScanQRScreenModel)
 }
 
 fun initKoin() {

@@ -1,4 +1,4 @@
-package fi.solita.hrnd.data.model
+package fi.solita.hrnd.core.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

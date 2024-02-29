@@ -1,6 +1,6 @@
-package fi.solita.hrnd.data
+package fi.solita.hrnd.core.data
 
-import fi.solita.hrnd.data.model.PatientInfo
+import fi.solita.hrnd.core.data.model.PatientInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +15,7 @@ interface HealthRepository {
 }
 
 class HealthRepositoryImpl(
-        private val museumApi: HealthApi,
+    private val museumApi: HealthApi,
 ) : HealthRepository {
 
     private val _patients: MutableStateFlow<List<PatientInfo>> = MutableStateFlow(listOf())

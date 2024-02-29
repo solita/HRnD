@@ -1,4 +1,4 @@
-package fi.solita.hrnd.presentation.designSystem.theme
+package fi.solita.hrnd.core.designSystem.theme
 
 import androidx.compose.ui.graphics.Color
 

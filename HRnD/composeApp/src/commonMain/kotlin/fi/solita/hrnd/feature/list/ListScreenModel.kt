@@ -1,9 +1,9 @@
-package fi.solita.hrnd.presentation.screens.list
+package fi.solita.hrnd.feature.list
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import fi.solita.hrnd.data.HealthRepository
-import fi.solita.hrnd.data.model.PatientInfo
+import fi.solita.hrnd.core.data.HealthRepository
+import fi.solita.hrnd.core.data.model.PatientInfo
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -73,29 +73,4 @@ class ListScreenModel(
             is ListScreenEvent.OnSearchUpdate -> onSearchUpdate(event.keyWord)
         }
     }
-}
-
-
-data class ListScreenState(
-    val patients: ImmutableList<PatientInfo> = persistentListOf(),
-    val patientSearchKeyWord: String = ""
-)
-
-val listScreenMockState = ListScreenState(
-        patients = persistentListOf(
-                PatientInfo("1","Michal","Guspiel","9/18/1997", currentRoom = null),
-                PatientInfo("1","Johh","Doe","1/29/1979", currentRoom = "12"),
-        ),
-        patientSearchKeyWord = ""
-)
-
-sealed class ListScreenSideEffect {
-    data class NavigateToPatient(val patientId: String) : ListScreenSideEffect()
-    data object NavigateToQRScreen : ListScreenSideEffect()
-}
-
-sealed class ListScreenEvent {
-    data object OnFabClicked : ListScreenEvent()
-    data class OnPatientClicked(val patientId: String?) : ListScreenEvent()
-    data class OnSearchUpdate(val keyWord: String) : ListScreenEvent()
 }

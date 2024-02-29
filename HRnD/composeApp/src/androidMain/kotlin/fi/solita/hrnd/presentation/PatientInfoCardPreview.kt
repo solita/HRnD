@@ -2,8 +2,8 @@ package fi.solita.hrnd.presentation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import fi.solita.hrnd.data.model.PatientInfo
-import fi.solita.hrnd.presentation.screens.list.composables.PatientInfoCard
+import fi.solita.hrnd.core.data.model.PatientInfo
+import fi.solita.hrnd.feature.list.composables.PatientInfoCard
 
 @Preview
 @Composable

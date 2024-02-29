@@ -1,4 +1,4 @@
-package fi.solita.hrnd.presentation.screens.list.composables
+package fi.solita.hrnd.feature.list.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.compose.stringResource
 import fi.solita.hrnd.MR
-import fi.solita.hrnd.data.model.PatientInfo
+import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.domain.utils.getAgeAndDateTimeUnit
-import fi.solita.hrnd.presentation.designSystem.DecorativeBall
+import fi.solita.hrnd.core.designSystem.DecorativeBall
 import kotlinx.datetime.DateTimeUnit
 
 @Composable

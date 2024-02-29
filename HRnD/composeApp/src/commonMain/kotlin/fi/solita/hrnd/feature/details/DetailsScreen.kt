@@ -1,13 +1,12 @@
-package fi.solita.hrnd.presentation.screens.qr
+package fi.solita.hrnd.feature.details
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 
-class ScanQRScreen : Screen {
-
+class DetailsScreen(val patientId : String?): Screen {
     @Composable
     override fun Content() {
-        Text("QR code Screen!")
+        Text("Details Screen $patientId")
     }
 }

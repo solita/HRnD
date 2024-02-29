@@ -1,4 +1,4 @@
-package fi.solita.hrnd.presentation.screens.list
+package fi.solita.hrnd.feature.list
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -40,11 +39,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
 import fi.solita.hrnd.MR
-import fi.solita.hrnd.presentation.designSystem.EmptyContent
-import fi.solita.hrnd.presentation.designSystem.theme.Typography
-import fi.solita.hrnd.presentation.screens.details.DetailsScreen
-import fi.solita.hrnd.presentation.screens.list.composables.PatientInfoCard
-import fi.solita.hrnd.presentation.screens.qr.ScanQRScreen
+import fi.solita.hrnd.core.designSystem.EmptyContent
+import fi.solita.hrnd.core.designSystem.theme.Typography
+import fi.solita.hrnd.feature.details.DetailsScreen
+import fi.solita.hrnd.feature.list.composables.PatientInfoCard
+import fi.solita.hrnd.feature.qr.ScanQRScreen
 import io.github.aakira.napier.Napier
 
 data object ListScreen : Screen {
@@ -72,9 +71,7 @@ data object ListScreen : Screen {
                     navigator.push(ScanQRScreen())
                 }
 
-                null -> {
-                    Napier.i { "Side Effect is null" }
-                }
+                null -> Napier.i { "Side Effect is null" }
             }
         }
 

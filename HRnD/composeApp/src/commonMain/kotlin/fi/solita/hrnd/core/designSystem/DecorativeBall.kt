@@ -1,4 +1,4 @@
-package fi.solita.hrnd.presentation.designSystem
+package fi.solita.hrnd.core.designSystem
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
