@@ -1,6 +1,5 @@
-package fi.solita.hrnd.core.designSystem.theme
+package fi.solita.hrnd.designSystem.theme
 
-import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
 import androidx.compose.ui.unit.dp

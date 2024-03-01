@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinxSerialization)
-    alias(libs.plugins.mokoResources)
 }
 
 kotlin {
@@ -27,8 +26,6 @@ kotlin {
     }
 
     sourceSets {
-        // Required for moko-resources to work
-        applyDefaultHierarchyTemplate()
 
         androidMain {
             dependencies {
@@ -38,17 +35,18 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
                 implementation(libs.ktor.client.okhttp)
             }
-
-            // Required for moko-resources to work
-            dependsOn(commonMain.get())
         }
+
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(compose.components.uiToolingPreview)
+            implementation(compose.components.resources)
 
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
@@ -59,7 +57,6 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.koin)
             implementation(libs.voyager.transitions)
-            implementation(libs.moko.resources.compose)
 
             implementation(libs.napier)
 
@@ -68,6 +65,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlin.immutable.collections)
         }
+        
         val commonTest by getting {
             dependencies {
                 implementation(libs.kotlin.test)
@@ -137,8 +135,4 @@ android {
     dependencies {
         debugImplementation(libs.compose.ui.tooling)
     }
-}
-
-multiplatformResources {
-    multiplatformResourcesPackage = "fi.solita.hrnd"
 }

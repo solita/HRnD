@@ -1,4 +1,4 @@
-package fi.solita.hrnd.core.designSystem.theme
+package fi.solita.hrnd.designSystem.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

@@ -16,13 +16,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.icerock.moko.resources.compose.stringResource
-import fi.solita.hrnd.MR
 import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.domain.utils.getAgeAndDateTimeUnit
-import fi.solita.hrnd.core.designSystem.DecorativeBall
+import fi.solita.hrnd.designSystem.DecorativeBall
+import hrnd.composeapp.generated.resources.Res
+import hrnd.composeapp.generated.resources.*
 import kotlinx.datetime.DateTimeUnit
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PatientInfoCard(
     patientInfo: PatientInfo,
@@ -33,15 +37,15 @@ fun PatientInfoCard(
         val ageAndDateTimeUnit = getAgeAndDateTimeUnit(dateOfBirth)
         val age: String = when (ageAndDateTimeUnit?.second) {
             DateTimeUnit.YEAR -> {
-                stringResource(MR.strings.years_old,ageAndDateTimeUnit.first.toString())
+                stringResource(Res.string.years_old,ageAndDateTimeUnit.first.toString())
             }
             DateTimeUnit.MONTH -> {
-                stringResource(MR.strings.months_old,ageAndDateTimeUnit.first.toString())
+                stringResource(Res.string.months_old,ageAndDateTimeUnit.first.toString())
             }
             DateTimeUnit.WEEK -> {
-                stringResource(MR.strings.weeks_old,ageAndDateTimeUnit.first.toString())
+                stringResource(Res.string.weeks_old,ageAndDateTimeUnit.first.toString())
             }
-            else -> stringResource(MR.strings.unknown_age)
+            else -> stringResource(Res.string.unknown_age)
         }
 
         Row(
@@ -55,7 +59,7 @@ fun PatientInfoCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(gender ?: "Unknown gender", style = MaterialTheme.typography.body1)
+                    Text(gender ?: stringResource(Res.string.unknown_gender), style = MaterialTheme.typography.body1)
                     DecorativeBall(
                         Modifier.size(12.dp),
                         color = MaterialTheme.colors.primaryVariant
@@ -68,10 +72,28 @@ fun PatientInfoCard(
                     Icon(
                         Icons.Outlined.Info,
                         modifier = Modifier.size(32.dp),
-                        contentDescription = "patient info"
+                        contentDescription = stringResource(Res.string.patient_info_desc)
                     )
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PatientInfoCardPreivew() {
+    PatientInfoCard(
+        patientInfo = PatientInfo(
+            patientId = "",
+            firstName = "Tester",
+            lastName = "Test",
+            gender = "male",
+            bloodType = "A rh-",
+            height = "175 cm",
+            weight = "80 kg",
+            dateOfBirth = "1/29/1979",
+            currentRoom = "70",
+            allergies = null,
+            ), onClick = {})
 }

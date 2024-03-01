@@ -1,24 +1,12 @@
 package fi.solita.hrnd.feature.list
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
@@ -37,14 +25,20 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.icerock.moko.resources.compose.stringResource
-import fi.solita.hrnd.MR
-import fi.solita.hrnd.core.designSystem.EmptyContent
-import fi.solita.hrnd.core.designSystem.theme.Typography
+import fi.solita.hrnd.core.data.model.PatientInfo
+import fi.solita.hrnd.designSystem.EmptyContent
+import fi.solita.hrnd.designSystem.theme.HrndTheme
+import fi.solita.hrnd.designSystem.theme.Typography
 import fi.solita.hrnd.feature.details.DetailsScreen
 import fi.solita.hrnd.feature.list.composables.PatientInfoCard
 import fi.solita.hrnd.feature.qr.ScanQRScreen
+import hrnd.composeapp.generated.resources.Res
+import hrnd.composeapp.generated.resources.*
 import io.github.aakira.napier.Napier
+import kotlinx.collections.immutable.persistentListOf
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 data object ListScreen : Screen {
 
@@ -88,6 +82,7 @@ data object ListScreen : Screen {
         )
     }
 
+    @OptIn(ExperimentalResourceApi::class)
     @Composable
     fun BuildContent(
         state: ListScreenState,
@@ -100,7 +95,7 @@ data object ListScreen : Screen {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Spacer(Modifier.height(16.dp))
-                Text(stringResource(MR.strings.patients), style = Typography.h1)
+                Text(stringResource(Res.string.patients), style = Typography.h1)
                 Spacer(Modifier.height(16.dp))
                 TextField(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
@@ -116,7 +111,7 @@ data object ListScreen : Screen {
                     trailingIcon = {
                         Icon(
                             Icons.Default.Search,
-                            stringResource(MR.strings.search_icon_desc)
+                            stringResource(Res.string.search_icon_desc)
                         )
                     },
                     shape = RoundedCornerShape(24.dp),
@@ -153,13 +148,31 @@ data object ListScreen : Screen {
                         icon = {
                             Icon(
                                 Icons.Default.ArrowForward,
-                                stringResource(MR.strings.scan_qr_fab_desc)
+                                stringResource(Res.string.scan_qr_fab_desc)
                             )
                         },
-                        text = { Text(text = stringResource(MR.strings.scan_qr_fab)) },
+                        text = { Text(text = stringResource(Res.string.scan_qr_fab)) },
                     )
                 }
             }
         }
     }
 }
+
+@Preview
+@Composable
+private fun ListScreenPreview(){
+    HrndTheme {
+        Surface {
+            ListScreen.BuildContent(state = listScreenMockState, onEvent = {} )
+        }
+    }
+}
+
+val listScreenMockState = ListScreenState(
+    patients = persistentListOf(
+        PatientInfo("1","Michal","Guspiel","9/18/1997", currentRoom = null),
+        PatientInfo("1","Johh","Doe","1/29/1979", currentRoom = "12"),
+        ),
+    patientSearchKeyWord = ""
+)

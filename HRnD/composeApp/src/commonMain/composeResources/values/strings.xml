@@ -14,11 +14,13 @@
     <string name="no_data_available">No data available</string>
     <string name="patients">Patients</string>
     <string name="search_icon_desc">Search Icon</string>
+    <string name="patient_info_desc">Patient info</string>
 
-    <string name="years_old">%1\$s years old</string>
-    <string name="months_old">%1\$s months old</string>
-    <string name="weeks_old">%1\$s weeks old</string>
+    <string name="years_old">%1$s years old</string>
+    <string name="months_old">%1$s months old</string>
+    <string name="weeks_old">%1$s weeks old</string>
     <string name="unknown_age">Unknown age</string>
+    <string name="unknown_gender">Unspecified gender</string>
 
     <string name="scan_qr_fab">Scan QR</string>
     <string name="scan_qr_fab_desc">Scan QR code floating action button</string>
