@@ -17,7 +17,7 @@ val Typography = Typography(
     ),
     body2 = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.W500,
+        fontWeight = FontWeight.W400,
         fontSize = 14.sp,
         lineHeight = 21.sp,
     ),
@@ -49,4 +49,9 @@ val Typography = Typography(
         fontSize = 22.sp,
         fontWeight = FontWeight.W500,
     ),
+    caption = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Normal
+    )
 )

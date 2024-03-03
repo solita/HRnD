@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinxSerialization)
+    alias(libs.plugins.mockmp)
 }
 
 kotlin {
@@ -48,6 +49,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(compose.components.resources)
 
+            implementation(libs.kotlin.coroutines)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
@@ -70,9 +72,15 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.test)
                 implementation(libs.kotest.assert)
+                implementation(libs.kotlin.coroutines.test)
             }
         }
     }
+}
+
+mockmp {
+    usesHelper = true
+    installWorkaround()
 }
 
 android {

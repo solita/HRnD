@@ -56,7 +56,7 @@ data object ListScreen : Screen {
                 is ListScreenSideEffect.NavigateToPatient -> {
                     navigator.push(
                         DetailsScreen(
-                            (sideEffect.value as? ListScreenSideEffect.NavigateToPatient)?.patientId
+                            (sideEffect.value as? ListScreenSideEffect.NavigateToPatient)?.patientInfo
                         )
                     )
                 }
@@ -127,7 +127,7 @@ data object ListScreen : Screen {
                         LazyColumn {
                             items(state.patients) { item ->
                                 PatientInfoCard(item) {
-                                    onEvent(ListScreenEvent.OnPatientClicked(item.patientId))
+                                    onEvent(ListScreenEvent.OnPatientClicked(item))
                                 }
                             }
                             item {

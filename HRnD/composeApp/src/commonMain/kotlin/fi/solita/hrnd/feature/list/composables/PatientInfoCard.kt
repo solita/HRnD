@@ -17,10 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import fi.solita.hrnd.core.data.model.PatientInfo
+import fi.solita.hrnd.core.utils.PreviewUtil
 import fi.solita.hrnd.domain.utils.getAgeAndDateTimeUnit
 import fi.solita.hrnd.designSystem.DecorativeBall
+import fi.solita.hrnd.designSystem.GenderAndAgeRow
+import fi.solita.hrnd.designSystem.GenderAndAgeRowSize
 import hrnd.composeapp.generated.resources.Res
 import hrnd.composeapp.generated.resources.*
+import io.ktor.websocket.*
 import kotlinx.datetime.DateTimeUnit
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -34,20 +38,6 @@ fun PatientInfoCard(
     onClick: (patientId: String?) -> Unit
 ) {
     with(patientInfo) {
-        val ageAndDateTimeUnit = getAgeAndDateTimeUnit(dateOfBirth)
-        val age: String = when (ageAndDateTimeUnit?.second) {
-            DateTimeUnit.YEAR -> {
-                stringResource(Res.string.years_old,ageAndDateTimeUnit.first.toString())
-            }
-            DateTimeUnit.MONTH -> {
-                stringResource(Res.string.months_old,ageAndDateTimeUnit.first.toString())
-            }
-            DateTimeUnit.WEEK -> {
-                stringResource(Res.string.weeks_old,ageAndDateTimeUnit.first.toString())
-            }
-            else -> stringResource(Res.string.unknown_age)
-        }
-
         Row(
             modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
             Arrangement.SpaceBetween
@@ -55,17 +45,7 @@ fun PatientInfoCard(
 
             Column(horizontalAlignment = Alignment.Start) {
                 Text("$firstName $lastName", style = MaterialTheme.typography.h3)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(gender ?: stringResource(Res.string.unknown_gender), style = MaterialTheme.typography.body1)
-                    DecorativeBall(
-                        Modifier.size(12.dp),
-                        color = MaterialTheme.colors.primaryVariant
-                    )
-                    Text(text = age)
-                }
+                GenderAndAgeRow(gender = gender, dateOfBirth = dateOfBirth, size = GenderAndAgeRowSize.SMALL)
             }
             Column {
                 IconButton(onClick = { onClick(patientId) }) {
@@ -80,20 +60,10 @@ fun PatientInfoCard(
     }
 }
 
+
 @Preview
 @Composable
 fun PatientInfoCardPreivew() {
     PatientInfoCard(
-        patientInfo = PatientInfo(
-            patientId = "",
-            firstName = "Tester",
-            lastName = "Test",
-            gender = "male",
-            bloodType = "A rh-",
-            height = "175 cm",
-            weight = "80 kg",
-            dateOfBirth = "1/29/1979",
-            currentRoom = "70",
-            allergies = null,
-            ), onClick = {})
+        patientInfo = PreviewUtil.mockPatientInfo, onClick = {})
 }

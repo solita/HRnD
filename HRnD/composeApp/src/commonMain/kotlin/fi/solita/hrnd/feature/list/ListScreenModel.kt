@@ -6,7 +6,6 @@ import fi.solita.hrnd.core.data.HealthRepository
 import fi.solita.hrnd.core.data.model.PatientInfo
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
@@ -46,11 +45,8 @@ class ListScreenModel(
         }
     }
 
-    private fun onPatientClicked(patientId: String?) = intent {
-        if (patientId == null){
-            return@intent
-        }
-        postSideEffect(ListScreenSideEffect.NavigateToPatient(patientId))
+    private fun onPatientClicked(patientInfo: PatientInfo) = intent {
+        postSideEffect(ListScreenSideEffect.NavigateToPatient(patientInfo))
     }
 
     private fun onFabClicked() = intent {
@@ -69,7 +65,7 @@ class ListScreenModel(
         Napier.i { "handleEvent $event" }
         when (event) {
             ListScreenEvent.OnFabClicked -> onFabClicked()
-            is ListScreenEvent.OnPatientClicked -> onPatientClicked(event.patientId)
+            is ListScreenEvent.OnPatientClicked -> onPatientClicked(event.patientInfo)
             is ListScreenEvent.OnSearchUpdate -> onSearchUpdate(event.keyWord)
         }
     }

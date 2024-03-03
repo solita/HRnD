@@ -24,4 +24,8 @@
 
     <string name="scan_qr_fab">Scan QR</string>
     <string name="scan_qr_fab_desc">Scan QR code floating action button</string>
+
+    <string name="patient_id">Patient ID: %1$s</string>
+    <string name="current_status">Current status</string>
+
 </resources>

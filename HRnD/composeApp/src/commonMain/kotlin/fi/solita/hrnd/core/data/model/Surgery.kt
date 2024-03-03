@@ -6,8 +6,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Surgery(
-  @SerialName("patient_id") var patientId: String? = null,
-  @SerialName("surgery_name") var surgeryName: String? = null,
+  @SerialName("patient_id") var patientId: String,
+  @SerialName("surgery_name") var surgeryName: String,
   @SerialName("surgery_date") var surgeryDate: String? = null,
   @SerialName("surgery_outcome") var surgeryOutcome: String? = null,
   @SerialName("surgery_description") var surgeryDescription: String? = null

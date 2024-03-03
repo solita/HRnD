@@ -14,6 +14,7 @@ kamel = "0.9.1"
 voyager = "1.0.0"
 napier = "2.7.1"
 orbit = "6.1.0"
+coroutines = "1.8.0"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "jetpack-compose-bom" }
@@ -40,8 +41,12 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotest-assert = { module = "io.kotest:kotest-assertions-core", version = "5.8.0" }
 kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.7"}
 
+kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines"}
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinxSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+mockmp = { id = "org.kodein.mock.mockmp", version = "1.17.0"}

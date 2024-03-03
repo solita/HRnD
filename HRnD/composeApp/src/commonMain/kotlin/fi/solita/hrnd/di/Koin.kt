@@ -11,6 +11,9 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.dsl.factoryOf
@@ -27,14 +30,15 @@ val dataModule = module {
     }
 
     single<HealthApi> { KtorHealthApi(get()) }
+    single<CoroutineDispatcher> { Dispatchers.IO }
     single<HealthRepository> {
-        HealthRepositoryImpl(get())
+        HealthRepositoryImpl(get(), get())
     }
 }
 
 val screenModelsModule = module {
     factoryOf(::ListScreenModel)
-    factoryOf(::DetailsScreenModel)
+    factory<DetailsScreenModel> { p -> DetailsScreenModel(p[0], get()) }
     factoryOf(::ScanQRScreenModel)
 }
 

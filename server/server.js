@@ -62,6 +62,19 @@ app.get("/get_patient_surgeries", (req, res) => {
   res.send(filteredSurgery)
 });
 
+app.get("/get_patient_medical_history", (req, res) => {
+  // todo implement
+  // let path = "data/medical_history.json" 
+  // let data = fs.readFileSync(path)
+  // var dataObject = JSON.parse(data)
+  // let patientId = req.query.patient_id;
+
+  //let filteredSurgery = dataObject.filter(surgery => surgery.patient_id === patientId);
+  
+  console.log(filteredSurgery);
+  res.send(Array())
+});
+
 app.listen(8090, () => {
   console.log("SERVER STARTED\n","Server running at http://localhost:8090/");
 });
