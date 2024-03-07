@@ -1,5 +1,6 @@
 package fi.solita.hrnd.core.data.model
 
+import cafe.adriel.voyager.core.lifecycle.JavaSerializable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -16,6 +17,6 @@ data class PatientInfo(
     @SerialName("allergies") val allergies: String? = null,
     @SerialName("current_room") val currentRoom: String? = null,
     @SerialName("current_diagnosis") val currentDiagnosis: List<String>? = null
-) {
+): JavaSerializable {
     val fullName = "$firstName $lastName"
 }

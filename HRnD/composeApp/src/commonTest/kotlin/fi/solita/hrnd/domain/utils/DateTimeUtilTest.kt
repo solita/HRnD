@@ -1,13 +1,29 @@
 package fi.solita.hrnd.domain.utils
 
+import fi.solita.hrnd.core.utils.parseToLocalDateTime
 import io.kotest.matchers.shouldBe
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.*
 import kotlin.test.Test
 
 
 class DateTimeUtilTest {
+
     @Test
-    fun shouldGetCorrectAgeYears(){
+    fun shouldParseCorrectLocalDateTime() {
+        val foo = "2024-01-01T15:34:41Z".parseToLocalDateTime()
+        println(foo.toString())
+        foo.toString() shouldBe LocalDateTime(
+            year = 2024,
+            month = Month.JANUARY,
+            dayOfMonth = 1,
+            hour = 15,
+            minute = 34,
+            second = 41
+        ).toString().also { println(it) }
+    }
+
+    @Test
+    fun shouldGetCorrectAgeYears() {
         // Given
         val born2010 = "01/01/2010"
         val born2005 = "05/05/2005"
@@ -30,7 +46,7 @@ class DateTimeUtilTest {
     }
 
     @Test
-    fun shouldGetCorrectAgeMonths(){
+    fun shouldGetCorrectAgeMonths() {
         // Given
         val born2020 = "01/01/2020"
         val today2020 = LocalDateTime.parse("2020-06-01T22:19:44").date

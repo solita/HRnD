@@ -4,17 +4,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import fi.solita.hrnd.core.data.model.Surgery
 
 @Composable
-fun MedicalHistoryItem(surgery: Surgery, modifier: Modifier = Modifier) {
+fun MedicalHistoryItem(surgery: fi.solita.hrnd.domain.Surgery, modifier: Modifier = Modifier) {
     Column(modifier) {
-        Text(surgery.surgeryDate ?: "Unknown date")
-        Text(surgery.surgeryName)
-        surgery.surgeryOutcome?.let { outcome ->
+        Text(text = surgery.date.toString())
+        Text(surgery.name)
+        surgery.outcome?.let { outcome ->
             Text(outcome)
         }
-        surgery.surgeryDescription?.let { desc ->
+        surgery.description?.let { desc ->
             Text(desc)
         }
     }

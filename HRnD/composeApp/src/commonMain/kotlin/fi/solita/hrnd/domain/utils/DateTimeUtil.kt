@@ -11,15 +11,12 @@ import kotlinx.datetime.daysUntil
 import kotlinx.datetime.monthsUntil
 import kotlinx.datetime.toLocalDateTime
 
-fun getAge(
-    birthDate: String?,
-    today: LocalDate = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
-): Age? {
-    if (birthDate == null) {
-        Napier.e("Birth date missing")
+fun String?.parseToLocalDate() : LocalDate?{
+    if (this == null) {
+        Napier.e("Date missing")
         return null
     }
-    val dateParts = birthDate.split("/")
+    val dateParts = this.split("/")
     if (dateParts.size != 3) {
         Napier.e("Invalid date of birth format")
         return null
@@ -28,8 +25,14 @@ fun getAge(
     val month = monthStr.toIntOrNull() ?: return null
     val day = dayStr.toIntOrNull() ?: return null
     val year = yearStr.toIntOrNull() ?: return null
+    return LocalDate(year, month, day)
+}
 
-    val birthLocalDate = LocalDate(year, month, day)
+fun getAge(
+    birthDate: String?,
+    today: LocalDate = Clock.System.now().toLocalDateTime(TimeZone.UTC).date
+): Age? {
+    val birthLocalDate = birthDate?.parseToLocalDate() ?: return null
     val monthsUntil = DateTimePeriod(months = birthLocalDate.monthsUntil(today))
     val daysUntil = DateTimePeriod(days = birthLocalDate.daysUntil(today))
     return Age(
@@ -53,6 +56,5 @@ fun getAgeAndDateTimeUnit(dateOfBirth: String?): Pair<Int, DateTimeUnit>? {
         else -> {
             age.months to DateTimeUnit.MONTH
         }
-
     }
 }

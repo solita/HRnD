@@ -3,9 +3,9 @@ package fi.solita.hrnd.feature.details
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import fi.solita.hrnd.core.data.HealthRepository
-import fi.solita.hrnd.core.data.model.*
-import io.github.aakira.napier.Napier
-import kotlinx.collections.immutable.ImmutableList
+import fi.solita.hrnd.core.data.model.PatientInfo
+import fi.solita.hrnd.domain.PatientDetails
+import fi.solita.hrnd.domain.utils.toDomainPatientDetails
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -16,8 +16,7 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 class DetailsScreenModel(
     private val patientInfo: PatientInfo?,
     private val healthRepository: HealthRepository
-) :
-    ContainerHost<DetailsScreenState, DetailsScreenSideEffect>, ScreenModel {
+) : ContainerHost<DetailsScreenState, DetailsScreenSideEffect>, ScreenModel {
 
     override val container: Container<DetailsScreenState, DetailsScreenSideEffect> =
         screenModelScope.container(DetailsScreenState(patientInfo))
@@ -31,8 +30,7 @@ class DetailsScreenModel(
             screenModelScope.launch {
                 healthRepository.fetchPatientDetails(patientInfo.patientId).collect {
                     reduce {
-                        Napier.i { "Updating patientDetails with $it" }
-                        state.copy(patientDetails = it)
+                        state.copy(patientDetails = it.toDomainPatientDetails())
                     }
                 }
             }

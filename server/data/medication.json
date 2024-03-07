@@ -5,7 +5,7 @@
       "medication_name": "proin",
       "dosage": "7",
       "dosage_unit": "μg",
-      "frequency": "2x day",
+      "frequency": "2xDay",
       "start_date": "1/1/2024",
       "end_date": "1/4/2024"
     },
@@ -15,7 +15,7 @@
       "medication_name": "lacus",
       "dosage": "7",
       "dosage_unit": "g",
-      "frequency": "3x day",
+      "frequency": "twice daily",
       "start_date": "1/1/2024",
       "end_date": "1/5/2024"
     },
@@ -302,7 +302,7 @@
     {
       "medication_id": "31",
       "patient_id": "17",
-      "medication_name": "sapien cum sociis",
+      "medication_name": "sapien com sociis",
       "dosage": "9",
       "dosage_unit": "ml",
       "frequency": "2x day",
@@ -355,7 +355,7 @@
       "medication_name": "nunc nisl",
       "dosage": "9",
       "dosage_unit": "g",
-      "frequency": "2x day",
+      "frequency": "once daily",
       "start_date": "1/2/2024",
       "end_date": "1/3/2024"
     },

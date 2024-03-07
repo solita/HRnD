@@ -1,6 +1,16 @@
 package fi.solita.hrnd.feature.details
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,14 +30,16 @@ import fi.solita.hrnd.core.utils.PreviewUtil
 import fi.solita.hrnd.designSystem.EmptyContent
 import fi.solita.hrnd.designSystem.GenderAndAgeRow
 import fi.solita.hrnd.designSystem.GenderAndAgeRowSize
+import fi.solita.hrnd.feature.details.composables.ChartData
 import fi.solita.hrnd.feature.details.composables.CurrentStatusCard
 import fi.solita.hrnd.feature.details.composables.MedicalHistoryItem
-import fi.solita.hrnd.feature.details.composables.MiniChart
+import fi.solita.hrnd.feature.details.composables.MyMiniChart
 import hrnd.composeapp.generated.resources.Res
 import hrnd.composeapp.generated.resources.current_status
 import hrnd.composeapp.generated.resources.patient_id
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -38,10 +50,11 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val screenModel: DetailsScreenModel = getScreenModel(parameters = { parametersOf(patientInfo) })
+        val screenModel: DetailsScreenModel =
+            getScreenModel(parameters = { parametersOf(patientInfo) })
         val state by screenModel.container.stateFlow.collectAsState()
 
-        LaunchedEffect(patientInfo){
+        LaunchedEffect(patientInfo) {
             screenModel.fetchPatientDetails()
         }
 
@@ -51,7 +64,13 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
     @OptIn(ExperimentalResourceApi::class)
     @Composable
     fun BuildContent(state: DetailsScreenState = DetailsScreenState(patientInfo)) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+
+        val verticalScroll = rememberScrollState()
+
+        Column(
+            Modifier.fillMaxSize().padding(16.dp).verticalScroll(verticalScroll),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
             if (patientInfo != null) {
                 Spacer(Modifier.height(16.dp))
@@ -79,8 +98,9 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                 CurrentStatusCard(
                     modifier = Modifier,
                     placement = state.patientInfo?.currentRoom,
-                    currentMedication = state.patientDetails?.medication?.toImmutableList() ?: persistentListOf(),
-                    currentDiagnosis = state.patientInfo?.currentDiagnosis?.toImmutableList() ?: persistentListOf()
+                    currentMedication = state.patientDetails?.medication ?: persistentListOf(),
+                    currentDiagnosis = state.patientInfo?.currentDiagnosis?.toImmutableList()
+                        ?: persistentListOf()
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -89,12 +109,42 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Column(Modifier.weight(0.5f)) {
                         Text("Heart rate", style = MaterialTheme.typography.h2)
-                        MiniChart(Modifier)
+                        MyMiniChart(
+                            data = persistentListOf(
+                                ChartData(
+                                    label = "Heart rate",
+                                    color = MaterialTheme.colors.primary,
+                                    data = state.patientDetails?.mostRecentDayHeartRate?.map { it.heartRate }
+                                        ?: listOf()
+                                )
+                            ),
+                            timeStamps = state.patientDetails?.mostRecentDayHeartRate?.map { it.localDateTime }
+                                ?.toImmutableList(),
+                            modifier = Modifier
+                        )
                     }
                     Spacer(Modifier.width(16.dp))
                     Column(Modifier.weight(0.5f)) {
                         Text("Blood pressure", style = MaterialTheme.typography.h2)
-                        MiniChart(Modifier)
+                        MyMiniChart(
+                            data = persistentListOf(
+                                ChartData(
+                                    label = "Systolic Pressure",
+                                    color = MaterialTheme.colors.primary,
+                                    data = state.patientDetails?.mostRecentDayPressure?.map { it.systolicPressure }
+                                        ?: listOf()
+                                ),
+                                ChartData(
+                                    label = "Diastolic Pressure",
+                                    color = MaterialTheme.colors.secondary,
+                                    data = state.patientDetails?.mostRecentDayPressure?.map { it.diastolicPressure }
+                                        ?: listOf()
+                                )
+                            ),
+                            timeStamps = state.patientDetails?.mostRecentDayPressure?.map { it.localDateTime }
+                                ?.toPersistentList(),
+                            modifier = Modifier
+                        )
                     }
                 }
 
@@ -113,7 +163,10 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                         Text("No medical history")
                     } else {
                         state.patientDetails.surgery.forEach { surgery ->
-                            MedicalHistoryItem(modifier = Modifier.fillMaxWidth(), surgery = surgery)
+                            MedicalHistoryItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                surgery = surgery
+                            )
                             Spacer(Modifier.height(8.dp))
                         }
                     }
