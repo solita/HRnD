@@ -18,18 +18,21 @@ import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 
 class ListScreenModel(
-        private val healthRepository: HealthRepository
+    private val healthRepository: HealthRepository
 ) : ContainerHost<ListScreenState, ListScreenSideEffect>, ScreenModel {
 
     override val container: Container<ListScreenState, ListScreenSideEffect> =
-            screenModelScope.container(ListScreenState())
+        screenModelScope.container(ListScreenState())
 
     fun fetchPatients() = intent {
         healthRepository.fetchPatients()
         screenModelScope.launch {
             healthRepository.patients.collect {
                 reduce {
-                    state.copy(patients = it.filterPatientInfo(state.patientSearchKeyWord))
+                    state.copy(
+                        patients = it.filterPatientInfo(state.patientSearchKeyWord),
+                        isBusy = false
+                    )
                 }
             }
         }
@@ -39,8 +42,8 @@ class ListScreenModel(
     private fun onSearchUpdate(searchKeyWord: String) = blockingIntent {
         reduce {
             state.copy(
-                    patients = healthRepository.patients.value.filterPatientInfo(searchKeyWord),
-                    patientSearchKeyWord = searchKeyWord
+                patients = healthRepository.patients.value.filterPatientInfo(searchKeyWord),
+                patientSearchKeyWord = searchKeyWord
             )
         }
     }
@@ -64,9 +67,10 @@ class ListScreenModel(
     fun handleEvent(event: ListScreenEvent) {
         Napier.i { "handleEvent $event" }
         when (event) {
-            ListScreenEvent.OnFabClicked -> onFabClicked()
-            is ListScreenEvent.OnPatientClicked -> onPatientClicked(event.patientInfo)
-            is ListScreenEvent.OnSearchUpdate -> onSearchUpdate(event.keyWord)
+            ListScreenEvent.FabClicked -> onFabClicked()
+            is ListScreenEvent.PatientClicked -> onPatientClicked(event.patientInfo)
+            is ListScreenEvent.SearchUpdate -> onSearchUpdate(event.keyWord)
+            is ListScreenEvent.Refresh -> fetchPatients()
         }
     }
 }

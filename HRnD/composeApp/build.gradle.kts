@@ -66,6 +66,8 @@ kotlin {
 
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlin.immutable.collections)
+
+            implementation(libs.shimmer)
         }
         
         val commonTest by getting {

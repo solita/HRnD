@@ -1,15 +1,31 @@
 package fi.solita.hrnd.feature.list
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,14 +42,17 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import fi.solita.hrnd.core.data.model.PatientInfo
-import fi.solita.hrnd.designSystem.EmptyContent
+import fi.solita.hrnd.designSystem.NoDataAvailable
 import fi.solita.hrnd.designSystem.theme.HrndTheme
 import fi.solita.hrnd.designSystem.theme.Typography
 import fi.solita.hrnd.feature.details.DetailsScreen
 import fi.solita.hrnd.feature.list.composables.PatientInfoCard
 import fi.solita.hrnd.feature.qr.ScanQRScreen
 import hrnd.composeapp.generated.resources.Res
-import hrnd.composeapp.generated.resources.*
+import hrnd.composeapp.generated.resources.patients
+import hrnd.composeapp.generated.resources.scan_qr_fab
+import hrnd.composeapp.generated.resources.scan_qr_fab_desc
+import hrnd.composeapp.generated.resources.search_icon_desc
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.persistentListOf
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -82,60 +101,79 @@ data object ListScreen : Screen {
         )
     }
 
-    @OptIn(ExperimentalResourceApi::class)
+    @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
     @Composable
     fun BuildContent(
         state: ListScreenState,
         modifier: Modifier = Modifier,
         onEvent: (ListScreenEvent) -> Unit
     ) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
+        val pullRefreshState = rememberPullRefreshState(
+            onRefresh = { onEvent(ListScreenEvent.Refresh) },
+            refreshing = state.isBusy
+        )
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+                    .pullRefresh(pullRefreshState),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Spacer(Modifier.height(16.dp))
-                Text(stringResource(Res.string.patients), style = Typography.h1)
-                Spacer(Modifier.height(16.dp))
-                TextField(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                    value = state.patientSearchKeyWord,
-                    onValueChange = { onEvent(ListScreenEvent.OnSearchUpdate(it)) },
-                    maxLines = 1,
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
-                        capitalization = KeyboardCapitalization.Words,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            Icons.Default.Search,
-                            stringResource(Res.string.search_icon_desc)
-                        )
-                    },
-                    shape = RoundedCornerShape(24.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent
+                item {
+                    PullRefreshIndicator(state.isBusy, pullRefreshState)
+                }
+                item {
+                    Text(
+                        text = stringResource(Res.string.patients),
+                        style = Typography.h1,
+                        modifier = Modifier.padding(vertical = 16.dp)
                     )
-                )
-                Spacer(Modifier.height(16.dp))
-                AnimatedContent(state.patients.isNotEmpty()) { objectsAvailable ->
-                    if (objectsAvailable) {
-                        LazyColumn {
-                            items(state.patients) { item ->
-                                PatientInfoCard(item) {
-                                    onEvent(ListScreenEvent.OnPatientClicked(item))
-                                }
-                            }
-                            item {
-                                Spacer(Modifier.height(120.dp))
-                            }
+                }
+                item {
+                    TextField(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+                        value = state.patientSearchKeyWord,
+                        onValueChange = { onEvent(ListScreenEvent.SearchUpdate(it)) },
+                        maxLines = 1,
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrect = false,
+                            capitalization = KeyboardCapitalization.Words,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Done
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                Icons.Default.Search,
+                                stringResource(Res.string.search_icon_desc)
+                            )
+                        },
+                        shape = RoundedCornerShape(24.dp),
+                        colors = TextFieldDefaults.textFieldColors(
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent
+                        )
+                    )
+                }
+
+                item {
+                    Spacer(Modifier.height(16.dp))
+                }
+
+                if (state.patients.isNotEmpty()) {
+                    items(state.patients) { item ->
+                        PatientInfoCard(item) {
+                            onEvent(ListScreenEvent.PatientClicked(item))
                         }
-                    } else {
-                        EmptyContent(Modifier.fillMaxSize())
+                    }
+                    item {
+                        Spacer(Modifier.height(120.dp))
+                    }
+                } else {
+                    item {
+                        NoDataAvailable(Modifier.fillMaxSize())
                     }
                 }
             }
@@ -144,10 +182,10 @@ data object ListScreen : Screen {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     ExtendedFloatingActionButton(
                         modifier = Modifier.padding(32.dp),
-                        onClick = { onEvent(ListScreenEvent.OnFabClicked) },
+                        onClick = { onEvent(ListScreenEvent.FabClicked) },
                         icon = {
                             Icon(
-                                Icons.Default.ArrowForward,
+                                Icons.AutoMirrored.Default.ArrowForward,
                                 stringResource(Res.string.scan_qr_fab_desc)
                             )
                         },
@@ -161,18 +199,18 @@ data object ListScreen : Screen {
 
 @Preview
 @Composable
-private fun ListScreenPreview(){
+private fun ListScreenPreview() {
     HrndTheme {
         Surface {
-            ListScreen.BuildContent(state = listScreenMockState, onEvent = {} )
+            ListScreen.BuildContent(state = listScreenMockState, onEvent = {})
         }
     }
 }
 
 val listScreenMockState = ListScreenState(
     patients = persistentListOf(
-        PatientInfo("1","Michal","Guspiel","9/18/1997", currentRoom = null),
-        PatientInfo("1","Johh","Doe","1/29/1979", currentRoom = "12"),
-        ),
+        PatientInfo("1", "Michal", "Guspiel", "9/18/1997", currentRoom = null),
+        PatientInfo("1", "Johh", "Doe", "1/29/1979", currentRoom = "12"),
+    ),
     patientSearchKeyWord = ""
 )

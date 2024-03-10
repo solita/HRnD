@@ -6,6 +6,7 @@ import fi.solita.hrnd.core.data.HealthRepository
 import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.domain.PatientDetails
 import fi.solita.hrnd.domain.utils.toDomainPatientDetails
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -18,10 +19,15 @@ class DetailsScreenModel(
     private val healthRepository: HealthRepository
 ) : ContainerHost<DetailsScreenState, DetailsScreenSideEffect>, ScreenModel {
 
+    init {
+        Napier.i { "init DetailsScreenModel" }
+    }
+
     override val container: Container<DetailsScreenState, DetailsScreenSideEffect> =
         screenModelScope.container(DetailsScreenState(patientInfo))
 
     fun fetchPatientDetails() = intent {
+        Napier.i { "fetchPatientDetails" }
         if (patientInfo?.patientId == null) {
             reduce {
                 state.copy(error = DetailsScreenError.PatientIdMissing)

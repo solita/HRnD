@@ -17,20 +17,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.core.utils.PreviewUtil
-import fi.solita.hrnd.designSystem.EmptyContent
 import fi.solita.hrnd.designSystem.GenderAndAgeRow
 import fi.solita.hrnd.designSystem.GenderAndAgeRowSize
-import fi.solita.hrnd.feature.details.composables.ChartData
+import fi.solita.hrnd.designSystem.NoDataAvailable
+import fi.solita.hrnd.feature.details.model.ChartData
 import fi.solita.hrnd.feature.details.composables.CurrentStatusCard
 import fi.solita.hrnd.feature.details.composables.MedicalHistoryItem
 import fi.solita.hrnd.feature.details.composables.MyMiniChart
@@ -49,13 +50,17 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
 
     @Composable
     override fun Content() {
-        val navigator = LocalNavigator.currentOrThrow
         val screenModel: DetailsScreenModel =
             getScreenModel(parameters = { parametersOf(patientInfo) })
         val state by screenModel.container.stateFlow.collectAsState()
 
+        var patientDetailsFetched by rememberSaveable { mutableStateOf(false) } // todo move to ScreenModel
+
         LaunchedEffect(patientInfo) {
-            screenModel.fetchPatientDetails()
+            if (!patientDetailsFetched){
+                screenModel.fetchPatientDetails()
+                patientDetailsFetched = true
+            }
         }
 
         BuildContent(state)
@@ -65,10 +70,8 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
     @Composable
     fun BuildContent(state: DetailsScreenState = DetailsScreenState(patientInfo)) {
 
-        val verticalScroll = rememberScrollState()
-
         Column(
-            Modifier.fillMaxSize().padding(16.dp).verticalScroll(verticalScroll),
+            Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -114,13 +117,12 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                                 ChartData(
                                     label = "Heart rate",
                                     color = MaterialTheme.colors.primary,
-                                    data = state.patientDetails?.mostRecentDayHeartRate?.map { it.heartRate }
+                                    data = state.patientDetails?.mostRecentDayHeartRate?.map { it.heartRate.toDouble() }
                                         ?: listOf()
                                 )
                             ),
                             timeStamps = state.patientDetails?.mostRecentDayHeartRate?.map { it.localDateTime }
                                 ?.toImmutableList(),
-                            modifier = Modifier
                         )
                     }
                     Spacer(Modifier.width(16.dp))
@@ -171,11 +173,11 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                         }
                     }
                 } else {
-                    EmptyContent()
+                    NoDataAvailable()
                 }
 
             } else {
-                EmptyContent(Modifier.fillMaxSize())
+                NoDataAvailable(Modifier.fillMaxSize())
             }
         }
     }

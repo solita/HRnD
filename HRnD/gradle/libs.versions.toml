@@ -43,7 +43,7 @@ kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collect
 
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines"}
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
-
+shimmer = {module = "com.valentinilk.shimmer:compose-shimmer",version = "1.2.0"}
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
