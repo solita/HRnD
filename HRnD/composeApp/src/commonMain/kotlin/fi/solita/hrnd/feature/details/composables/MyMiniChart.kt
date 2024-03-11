@@ -8,27 +8,17 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.navigator.LocalNavigator
 import fi.solita.hrnd.designSystem.EmptyContent
-import fi.solita.hrnd.feature.details.DetailedChartScreen
-import fi.solita.hrnd.feature.details.model.ChartData
+import fi.solita.hrnd.domain.ChartData
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun MyMiniChart(
     data: ImmutableList<ChartData>?,
-    timeStamps: ImmutableList<LocalDateTime>?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onclick: () -> Unit
 ) {
-
-    val navigator = LocalNavigator.current
 
     Surface(
         modifier = modifier.aspectRatio(1f),
@@ -37,40 +27,30 @@ fun MyMiniChart(
         elevation = 6.dp
     ) {
 
-        if (data == null || timeStamps == null) {
+        if (data == null) {
             EmptyContent()
         } else {
             Chart(
                 numberOfDataSteps = 6,
                 data = data,
-                timeStamps = timeStamps,
                 modifier = Modifier.padding(4.dp).fillMaxSize().clickable {
-                    navigator?.push(
-                        DetailedChartScreen(
-                            data.toTypedArray(),
-                            timeStamps.map {
-                                it.toInstant(
-                                    TimeZone.UTC
-                                ).epochSeconds
-                            }.toTypedArray()
-                        )
-                    )
+                    onclick()
                 }
             )
         }
     }
 }
 
-@Preview
-@Composable
-private fun MyMiniChartPreview() {
-    MyMiniChart(
-        data = persistentListOf(
-            ChartData(
-                data = listOf(20.0, 30.0, 20.0),
-                label = "test",
-                color = Color.Blue
-            )
-        ), timeStamps = persistentListOf()
-    )
-}
+//@Preview
+//@Composable
+//private fun MyMiniChartPreview() {
+//    MyMiniChart(
+//        data = persistentListOf(
+//            ChartData(
+//                data = listOf(20.0, 30.0, 20.0),
+//                label = "test",
+//                color = Color.Blue
+//            )
+//        ), timeStamps = persistentListOf(), onclick = {}
+//    )
+//}

@@ -18,7 +18,7 @@ fun String?.parseToLocalDate() : LocalDate?{
     }
     val dateParts = this.split("/")
     if (dateParts.size != 3) {
-        Napier.e("Invalid date of birth format")
+        Napier.e("Invalid date format")
         return null
     }
     val (monthStr, dayStr, yearStr) = dateParts

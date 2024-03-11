@@ -2,13 +2,19 @@ package fi.solita.hrnd.domain.utils
 
 import fi.solita.hrnd.core.data.model.PatientDetails
 import fi.solita.hrnd.core.utils.parseToLocalDateTime
-import fi.solita.hrnd.domain.HeartRate
+import fi.solita.hrnd.domain.ChartData
+import fi.solita.hrnd.domain.ChartDataEntry
+import fi.solita.hrnd.domain.ChartDataType
 import fi.solita.hrnd.domain.Medication
-import fi.solita.hrnd.domain.Pressure
 import fi.solita.hrnd.domain.Surgery
 import io.github.aakira.napier.Napier
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
+
 
 fun PatientDetails.toDomainPatientDetails(): fi.solita.hrnd.domain.PatientDetails {
 
@@ -30,35 +36,53 @@ fun PatientDetails.toDomainPatientDetails(): fi.solita.hrnd.domain.PatientDetail
         )
     }
 
-    val heartRate: ImmutableList<HeartRate>? = heartRate?.map {
-        HeartRate(
-            it.heartRate?.toIntOrNull() ?: return@map null,
-            it.timestamp.parseToLocalDateTime() ?: return@map null
-        )
-    }?.sortedBy { it?.localDateTime }?.filterNotNull()?.toImmutableList()
+    val heartRate = ChartData(
+        type = ChartDataType.HEART_RATE,
+        entries = heartRate?.map {
+            ChartDataEntry(
+                timeStampEpochSeconds = it.timestamp.parseToEpochSeconds() ?: return@map null,
+                value = it.heartRate?.toDoubleOrNull() ?: return@map null
+            )
+        }?.filterNotNull()?.sortedBy { it.timeStampEpochSeconds }
+    )
 
-    val mostRecentHeartRateRecordedDate = heartRate?.maxOfOrNull { it.localDateTime }
-    Napier.i { "MostRecent Heart Rate Recored date: $mostRecentHeartRateRecordedDate" }
+    val mostRecentHeartRateRecordedDate = heartRate.getMostRecentDay()
 
-    val mostRecentHeartRate: ImmutableList<HeartRate>? = heartRate?.filter {
-        it.localDateTime.date == mostRecentHeartRateRecordedDate?.date
-    }?.sortedBy { it.localDateTime }?.toImmutableList()
+    Napier.i { "MostRecent Heart Rate recorded date: $mostRecentHeartRateRecordedDate" }
+
+    val mostRecentHeartRate: ChartData = heartRate.copy(
+        entries = heartRate.entries?.filter {
+            Instant.fromEpochSeconds(it.timeStampEpochSeconds)
+                .toLocalDateTime(TimeZone.UTC).date == mostRecentHeartRateRecordedDate
+        }
+    )
 
     Napier.i { "Most recent heart Rate: $mostRecentHeartRate" }
 
-    val pressure: ImmutableList<Pressure>? = pressure?.map {
-        Pressure(
-            systolicPressure = it.systolicPressure?.toDoubleOrNull() ?: return@map null,
-            diastolicPressure = it.diastolicPressure?.toDoubleOrNull() ?: return@map null,
-            localDateTime = it.timestamp.parseToLocalDateTime() ?: return@map null
-        )
-    }?.sortedBy { it?.localDateTime }?.filterNotNull()?.toImmutableList()
+    val systolicPressure = createPressureChartData(ChartDataType.SYSTOLIC_PRESSURE, pressure) {
+        it.systolicPressure?.toDoubleOrNull()
+    }
 
-    val mostRecentPressureRecorded = pressure?.maxOfOrNull { it.localDateTime }
+    val diastolicPressure = createPressureChartData(ChartDataType.DIASTOLIC_PRESSURE, pressure) {
+        it.diastolicPressure?.toDoubleOrNull()
+    }
 
-    val mostRecentPressure: ImmutableList<Pressure>? = pressure?.filter {
-        it.localDateTime.date == mostRecentPressureRecorded?.date
-    }?.sortedBy { it.localDateTime }?.toImmutableList()
+    val mostRecentSystolicPressureRecorded = systolicPressure.getMostRecentDay()
+    val mostRecentDiastolicPressureRecorded = diastolicPressure.getMostRecentDay()
+
+    val mostRecentSystolicPressure = systolicPressure.copy(
+        entries = systolicPressure.entries?.filter {
+            Instant.fromEpochSeconds(it.timeStampEpochSeconds)
+                .toLocalDateTime(TimeZone.UTC).date == mostRecentSystolicPressureRecorded
+        }
+    )
+
+    val mostRecentDiastolicPressure = diastolicPressure.copy(
+        entries = diastolicPressure.entries?.filter {
+            Instant.fromEpochSeconds(it.timeStampEpochSeconds)
+                .toLocalDateTime(TimeZone.UTC).date == mostRecentDiastolicPressureRecorded
+        }
+    )
 
     return fi.solita.hrnd.domain.PatientDetails(
         patientId = patientId,
@@ -66,7 +90,37 @@ fun PatientDetails.toDomainPatientDetails(): fi.solita.hrnd.domain.PatientDetail
         surgery = surgery?.toImmutableList(),
         fullHeartRate = heartRate,
         mostRecentDayHeartRate = mostRecentHeartRate,
-        fullPressure = pressure,
-        mostRecentDayPressure = mostRecentPressure
+        fullSystolicPressure = systolicPressure,
+        fullDiastolicPressure = diastolicPressure,
+        mostRecentDaySystolicPressure = mostRecentSystolicPressure,
+        mostRecentDayDiastolicPressure = mostRecentDiastolicPressure
+    )
+}
+
+fun ChartData.getMostRecentDay(): LocalDate? {
+    return this.entries?.maxOfOrNull { it.timeStampEpochSeconds }
+        ?.let { Instant.fromEpochSeconds(it) }
+        ?.toLocalDateTime(TimeZone.UTC)?.date
+}
+
+fun String?.parseToEpochSeconds(): Long? {
+    return this.parseToLocalDateTime()
+        ?.toInstant(TimeZone.UTC)?.epochSeconds
+}
+
+fun createPressureChartData(
+    type: ChartDataType,
+    pressure: List<fi.solita.hrnd.core.data.model.Pressure>?,
+    pressureExtractor: (fi.solita.hrnd.core.data.model.Pressure) -> Double?
+): ChartData {
+    return ChartData(
+        type = type,
+        entries = pressure?.map { pressureData ->
+            ChartDataEntry(
+                timeStampEpochSeconds = pressureData.timestamp.parseToEpochSeconds()
+                    ?: return@map null,
+                value = pressureExtractor(pressureData) ?: return@map null
+            )
+        }?.filterNotNull()?.sortedBy { it.timeStampEpochSeconds }
     )
 }

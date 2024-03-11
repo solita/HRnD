@@ -26,12 +26,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
 import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.core.utils.PreviewUtil
 import fi.solita.hrnd.designSystem.GenderAndAgeRow
 import fi.solita.hrnd.designSystem.GenderAndAgeRowSize
 import fi.solita.hrnd.designSystem.NoDataAvailable
-import fi.solita.hrnd.feature.details.model.ChartData
+import fi.solita.hrnd.domain.utils.getMostRecentDay
 import fi.solita.hrnd.feature.details.composables.CurrentStatusCard
 import fi.solita.hrnd.feature.details.composables.MedicalHistoryItem
 import fi.solita.hrnd.feature.details.composables.MyMiniChart
@@ -40,7 +41,6 @@ import hrnd.composeapp.generated.resources.current_status
 import hrnd.composeapp.generated.resources.patient_id
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toPersistentList
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -57,7 +57,7 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
         var patientDetailsFetched by rememberSaveable { mutableStateOf(false) } // todo move to ScreenModel
 
         LaunchedEffect(patientInfo) {
-            if (!patientDetailsFetched){
+            if (!patientDetailsFetched) {
                 screenModel.fetchPatientDetails()
                 patientDetailsFetched = true
             }
@@ -69,6 +69,10 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
     @OptIn(ExperimentalResourceApi::class)
     @Composable
     fun BuildContent(state: DetailsScreenState = DetailsScreenState(patientInfo)) {
+
+        val primaryColor = MaterialTheme.colors.primary
+        val secondaryColor = MaterialTheme.colors.secondary
+        val navigator = LocalNavigator.current
 
         Column(
             Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
@@ -114,15 +118,24 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                         Text("Heart rate", style = MaterialTheme.typography.h2)
                         MyMiniChart(
                             data = persistentListOf(
-                                ChartData(
-                                    label = "Heart rate",
-                                    color = MaterialTheme.colors.primary,
-                                    data = state.patientDetails?.mostRecentDayHeartRate?.map { it.heartRate.toDouble() }
-                                        ?: listOf()
+                                state.patientDetails?.mostRecentDayHeartRate?.copy(
+                                    color = primaryColor
                                 )
-                            ),
-                            timeStamps = state.patientDetails?.mostRecentDayHeartRate?.map { it.localDateTime }
-                                ?.toImmutableList(),
+                            ).filterNotNull().toImmutableList(),
+                            onclick = {
+                                navigator?.push(
+                                    DetailedChartScreen(
+                                        persistentListOf(
+                                            state.patientDetails?.fullHeartRate?.copy(
+                                                color = primaryColor
+                                            )
+                                        ).filterNotNull().toTypedArray(),
+                                        mostRecentDayOfRecordedDataEpoch =
+                                        state.patientDetails?.mostRecentDayHeartRate?.getMostRecentDay()
+                                            ?.toEpochDays() ?: Int.MAX_VALUE
+                                    )
+                                )
+                            }
                         )
                     }
                     Spacer(Modifier.width(16.dp))
@@ -130,22 +143,37 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                         Text("Blood pressure", style = MaterialTheme.typography.h2)
                         MyMiniChart(
                             data = persistentListOf(
-                                ChartData(
-                                    label = "Systolic Pressure",
-                                    color = MaterialTheme.colors.primary,
-                                    data = state.patientDetails?.mostRecentDayPressure?.map { it.systolicPressure }
-                                        ?: listOf()
+                                state.patientDetails?.mostRecentDaySystolicPressure?.copy(
+                                    color = primaryColor
                                 ),
-                                ChartData(
-                                    label = "Diastolic Pressure",
-                                    color = MaterialTheme.colors.secondary,
-                                    data = state.patientDetails?.mostRecentDayPressure?.map { it.diastolicPressure }
-                                        ?: listOf()
+                                state.patientDetails?.mostRecentDayDiastolicPressure?.copy(
+                                    color = secondaryColor
                                 )
-                            ),
-                            timeStamps = state.patientDetails?.mostRecentDayPressure?.map { it.localDateTime }
-                                ?.toPersistentList(),
-                            modifier = Modifier
+                            ).filterNotNull().toImmutableList(),
+                            onclick = {
+                                val mostRecentDayOfRecordedSystolicPressure =
+                                    state.patientDetails?.mostRecentDaySystolicPressure?.getMostRecentDay()
+                                        ?.toEpochDays()
+                                val mostRecentDayOfRecordedDiastolicPressure =
+                                    state.patientDetails?.mostRecentDayDiastolicPressure?.getMostRecentDay()
+                                        ?.toEpochDays()
+                                navigator?.push(
+                                    DetailedChartScreen(
+                                        persistentListOf(
+                                            state.patientDetails?.fullSystolicPressure?.copy(
+                                                color = primaryColor
+                                            ),
+                                            state.patientDetails?.fullDiastolicPressure?.copy(
+                                                color = secondaryColor
+                                            )
+                                        ).filterNotNull().toTypedArray(),
+                                        mostRecentDayOfRecordedDataEpoch = maxOf(
+                                            mostRecentDayOfRecordedDiastolicPressure ?: Int.MAX_VALUE,
+                                            mostRecentDayOfRecordedSystolicPressure ?: Int.MAX_VALUE
+                                        )
+                                    )
+                                )
+                            }
                         )
                     }
                 }
