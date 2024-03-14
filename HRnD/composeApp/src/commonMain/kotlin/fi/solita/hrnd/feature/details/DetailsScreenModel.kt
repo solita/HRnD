@@ -36,7 +36,10 @@ class DetailsScreenModel(
             screenModelScope.launch {
                 healthRepository.fetchPatientDetails(patientInfo.patientId).collect {
                     reduce {
-                        state.copy(patientDetails = it.toDomainPatientDetails())
+                        state.copy(
+                            patientDetails = it.toDomainPatientDetails(),
+                            patientDetailsFetched = true
+                        )
                     }
                 }
             }
@@ -51,7 +54,6 @@ class DetailsScreenModel(
 
     fun handleEvent(event: DetailsScreenEvent) {
         when (event) {
-            DetailsScreenEvent.OnRefresh -> fetchPatientDetails()
             DetailsScreenEvent.ErrorDismissed -> errorDismissed()
         }
     }
@@ -59,6 +61,7 @@ class DetailsScreenModel(
 
 data class DetailsScreenState(
     val patientInfo: PatientInfo?,
+    val patientDetailsFetched: Boolean = false,
     val patientDetails: PatientDetails? = null,
     val error: DetailsScreenError? = null
 )
@@ -71,5 +74,4 @@ sealed class DetailsScreenError : Error() {
 
 sealed class DetailsScreenEvent {
     data object ErrorDismissed : DetailsScreenEvent()
-    data object OnRefresh : DetailsScreenEvent()
 }

@@ -17,8 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import fi.solita.hrnd.domain.Medication
+import hrnd.composeapp.generated.resources.Res
+import hrnd.composeapp.generated.resources.current_medication_label
+import hrnd.composeapp.generated.resources.diagnosis_label
+import hrnd.composeapp.generated.resources.diagnosis_missing
+import hrnd.composeapp.generated.resources.no_medication
+import hrnd.composeapp.generated.resources.not_admitted
+import hrnd.composeapp.generated.resources.placement_label
 import kotlinx.collections.immutable.ImmutableList
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CurrentStatusCard(
     placement: String?,
@@ -38,15 +48,15 @@ fun CurrentStatusCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(Modifier.weight(0.4f)) {
-                Text("Placement", style = MaterialTheme.typography.h3)
+                Text(stringResource(Res.string.placement_label), style = MaterialTheme.typography.h3)
                 Spacer(Modifier.height(4.dp))
-                Text(placement ?: "Unadmitted", style = MaterialTheme.typography.body2)
+                Text(placement ?: stringResource(Res.string.not_admitted), style = MaterialTheme.typography.body2)
                 Spacer(Modifier.height(8.dp))
 
-                Text("Diagnosis", style = MaterialTheme.typography.h3)
+                Text(stringResource(Res.string.diagnosis_label), style = MaterialTheme.typography.h3)
                 Spacer(Modifier.height(4.dp))
                 if (currentDiagnosis.isEmpty()) {
-                    Text("Diagnosis missing", style = MaterialTheme.typography.body2)
+                    Text(stringResource(Res.string.diagnosis_missing), style = MaterialTheme.typography.body2)
                 } else {
                     currentDiagnosis.forEach { diagnosis ->
                         Text(diagnosis, style = MaterialTheme.typography.body2)
@@ -55,10 +65,10 @@ fun CurrentStatusCard(
             }
             Spacer(Modifier.size(32.dp))
             Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(0.6f)) {
-                Text("Current medication", style = MaterialTheme.typography.h3)
+                Text(stringResource(Res.string.current_medication_label), style = MaterialTheme.typography.h3, textAlign = TextAlign.End)
                 Spacer(Modifier.height(4.dp))
                 if (currentMedication.isEmpty()) {
-                    Text("No medication", style = MaterialTheme.typography.body2)
+                    Text(stringResource(Res.string.no_medication), style = MaterialTheme.typography.body2)
                 } else {
                     currentMedication.forEach { medication ->
                         Text(
@@ -73,32 +83,3 @@ fun CurrentStatusCard(
         }
     }
 }
-
-//@Preview TODO FIX
-//@Composable
-//fun PreviewCurrentStatusCard() {
-//    CurrentStatusCard(
-//        placement = "Room 12a",
-//        currentMedication = persistentListOf(
-//            Medication(
-//                medicationName = "Scorbolamid",
-//                dosage = "2",
-//                dosageUnit = "pills",
-//                startDate = "",
-//                endDate = "",
-//                frequency = "2x day",
-//                patientId = "1"
-//            ),
-//            Medication(
-//                medicationName = "Vitamin C",
-//                dosage = "1",
-//                dosageUnit = "pill",
-//                startDate = "",
-//                endDate = "",
-//                frequency = "3x day",
-//                patientId = "1"
-//            )
-//        ),
-//        currentDiagnosis = persistentListOf("Influenza A", "Broken Leg")
-//    )
-//}

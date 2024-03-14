@@ -41,13 +41,13 @@ val Typography = Typography(
     ),
     h4 = TextStyle(
         fontFamily = FontFamily.Default,
-        fontSize = 24.sp,
+        fontSize = 18.sp,
         fontWeight = FontWeight.W700,
     ),
     h5 = TextStyle(
         fontFamily = FontFamily.Default,
-        fontSize = 22.sp,
-        fontWeight = FontWeight.W500,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.W400,
     ),
     caption = TextStyle(
         fontFamily = FontFamily.Default,

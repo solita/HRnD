@@ -28,11 +28,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import fi.solita.hrnd.core.utils.isPortrait
 import fi.solita.hrnd.designSystem.DecorativeBall
+import fi.solita.hrnd.designSystem.NavigationElement
 import fi.solita.hrnd.domain.ChartData
 import fi.solita.hrnd.domain.ChartDataType
 import fi.solita.hrnd.feature.details.composables.Chart
+import hrnd.composeapp.generated.resources.Res
+import hrnd.composeapp.generated.resources.diastolic_pressure
+import hrnd.composeapp.generated.resources.heart_rate
+import hrnd.composeapp.generated.resources.nav_patient_details
+import hrnd.composeapp.generated.resources.next_day
+import hrnd.composeapp.generated.resources.previous_day
+import hrnd.composeapp.generated.resources.systolic_pressure
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -44,6 +54,8 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 
 class DetailedChartScreen(
     private val chartData: Array<ChartData>,
@@ -56,8 +68,11 @@ class DetailedChartScreen(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BuildContent(data: ImmutableList<ChartData>, mostRecentDayOfRecordedDataEpoch: Int) {
+
+    val navigator = LocalNavigator.currentOrThrow
 
     var date by remember(mostRecentDayOfRecordedDataEpoch) {
         mutableStateOf(LocalDate.fromEpochDays(mostRecentDayOfRecordedDataEpoch))
@@ -94,6 +109,13 @@ fun BuildContent(data: ImmutableList<ChartData>, mostRecentDayOfRecordedDataEpoc
             },
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        NavigationElement(
+            previousScreenTitle = stringResource(Res.string.nav_patient_details),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            navigator.pop()
+        }
+
         if (isPortrait) {
             Spacer(Modifier.fillMaxSize(0.2f))
         } else {
@@ -113,9 +135,9 @@ fun BuildContent(data: ImmutableList<ChartData>, mostRecentDayOfRecordedDataEpoc
                 Text(
                     text =
                     when (it.type) {
-                        ChartDataType.HEART_RATE -> "Heart rate"
-                        ChartDataType.DIASTOLIC_PRESSURE -> "Diastolic pressure"
-                        ChartDataType.SYSTOLIC_PRESSURE -> "Systolic pressure"
+                        ChartDataType.HEART_RATE -> stringResource(Res.string.heart_rate)
+                        ChartDataType.DIASTOLIC_PRESSURE -> stringResource(Res.string.diastolic_pressure)
+                        ChartDataType.SYSTOLIC_PRESSURE -> stringResource(Res.string.systolic_pressure)
                     }, style = MaterialTheme.typography.h3
                 )
             }
@@ -141,7 +163,7 @@ fun BuildContent(data: ImmutableList<ChartData>, mostRecentDayOfRecordedDataEpoc
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                    contentDescription = "Previous day"
+                    contentDescription = stringResource(Res.string.previous_day)
                 )
             }
 
@@ -158,7 +180,7 @@ fun BuildContent(data: ImmutableList<ChartData>, mostRecentDayOfRecordedDataEpoc
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                    contentDescription = "Next Day "
+                    contentDescription = stringResource(Res.string.next_day)
                 )
             }
         }

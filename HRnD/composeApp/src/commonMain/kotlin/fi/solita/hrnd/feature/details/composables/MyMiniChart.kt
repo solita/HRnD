@@ -40,17 +40,3 @@ fun MyMiniChart(
         }
     }
 }
-
-//@Preview
-//@Composable
-//private fun MyMiniChartPreview() {
-//    MyMiniChart(
-//        data = persistentListOf(
-//            ChartData(
-//                data = listOf(20.0, 30.0, 20.0),
-//                label = "test",
-//                color = Color.Blue
-//            )
-//        ), timeStamps = persistentListOf(), onclick = {}
-//    )
-//}

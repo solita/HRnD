@@ -17,9 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -31,13 +28,19 @@ import fi.solita.hrnd.core.data.model.PatientInfo
 import fi.solita.hrnd.core.utils.PreviewUtil
 import fi.solita.hrnd.designSystem.GenderAndAgeRow
 import fi.solita.hrnd.designSystem.GenderAndAgeRowSize
+import fi.solita.hrnd.designSystem.NavigationElement
 import fi.solita.hrnd.designSystem.NoDataAvailable
 import fi.solita.hrnd.domain.utils.getMostRecentDay
 import fi.solita.hrnd.feature.details.composables.CurrentStatusCard
 import fi.solita.hrnd.feature.details.composables.MedicalHistoryItem
 import fi.solita.hrnd.feature.details.composables.MyMiniChart
 import hrnd.composeapp.generated.resources.Res
+import hrnd.composeapp.generated.resources.blood_pressure
 import hrnd.composeapp.generated.resources.current_status
+import hrnd.composeapp.generated.resources.heart_rate
+import hrnd.composeapp.generated.resources.medical_history
+import hrnd.composeapp.generated.resources.nav_list
+import hrnd.composeapp.generated.resources.no_medical_history
 import hrnd.composeapp.generated.resources.patient_id
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -54,12 +57,9 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
             getScreenModel(parameters = { parametersOf(patientInfo) })
         val state by screenModel.container.stateFlow.collectAsState()
 
-        var patientDetailsFetched by rememberSaveable { mutableStateOf(false) } // todo move to ScreenModel
-
         LaunchedEffect(patientInfo) {
-            if (!patientDetailsFetched) {
+            if (!state.patientDetailsFetched) {
                 screenModel.fetchPatientDetails()
-                patientDetailsFetched = true
             }
         }
 
@@ -78,6 +78,13 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
             Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            NavigationElement(
+                previousScreenTitle = stringResource(Res.string.nav_list),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                navigator?.pop()
+            }
 
             if (patientInfo != null) {
                 Spacer(Modifier.height(16.dp))
@@ -115,7 +122,7 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                 // Heart rate and Blood pressure section
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Column(Modifier.weight(0.5f)) {
-                        Text("Heart rate", style = MaterialTheme.typography.h2)
+                        Text(stringResource(Res.string.heart_rate), style = MaterialTheme.typography.h2)
                         MyMiniChart(
                             data = persistentListOf(
                                 state.patientDetails?.mostRecentDayHeartRate?.copy(
@@ -140,7 +147,7 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                     }
                     Spacer(Modifier.width(16.dp))
                     Column(Modifier.weight(0.5f)) {
-                        Text("Blood pressure", style = MaterialTheme.typography.h2)
+                        Text(stringResource(Res.string.blood_pressure), style = MaterialTheme.typography.h2)
                         MyMiniChart(
                             data = persistentListOf(
                                 state.patientDetails?.mostRecentDaySystolicPressure?.copy(
@@ -168,7 +175,8 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                                             )
                                         ).filterNotNull().toTypedArray(),
                                         mostRecentDayOfRecordedDataEpoch = maxOf(
-                                            mostRecentDayOfRecordedDiastolicPressure ?: Int.MAX_VALUE,
+                                            mostRecentDayOfRecordedDiastolicPressure
+                                                ?: Int.MAX_VALUE,
                                             mostRecentDayOfRecordedSystolicPressure ?: Int.MAX_VALUE
                                         )
                                     )
@@ -182,7 +190,7 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
 
                 // Medical History Section
                 Text(
-                    text = "Medical history",
+                    text = stringResource(Res.string.medical_history),
                     style = MaterialTheme.typography.h2,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Start,
@@ -190,7 +198,7 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
                 Spacer(Modifier.height(16.dp))
                 if (state.patientDetails?.surgery != null) {
                     if (state.patientDetails.surgery.isEmpty()) {
-                        Text("No medical history")
+                        Text(stringResource(Res.string.no_medical_history))
                     } else {
                         state.patientDetails.surgery.forEach { surgery ->
                             MedicalHistoryItem(

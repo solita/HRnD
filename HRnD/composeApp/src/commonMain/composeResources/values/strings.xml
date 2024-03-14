@@ -28,4 +28,27 @@
     <string name="patient_id">Patient ID: %1$s</string>
     <string name="current_status">Current status</string>
 
+    <string name="back_button_desc">back button</string>
+
+    <string name="medical_history">Medical history</string>
+    <string name="no_medical_history">No medical history</string>
+    <string name="blood_pressure">Blood pressure</string>
+    <string name="heart_rate">Heart rate</string>
+    <string name="diastolic_pressure">Diastolic pressure</string>
+    <string name="systolic_pressure">Systolic pressure</string>
+    <string name="previous_day">previous day</string>
+    <string name="next_day">next day</string>
+    <string name="today">Today</string>
+
+    <string name="placement_label">Placement</string>
+    <string name="not_admitted">Not admitted</string>
+    <string name="diagnosis_label">Diagnosis</string>
+    <string name="diagnosis_missing">Diagnosis missing</string>
+    <string name="current_medication_label">Current medication</string>
+    <string name="no_medication">No medication</string>
+
+
+    <!--    Navigation titles-->
+    <string name="nav_patient_details">Patient details</string>
+    <string name="nav_list">Patient list</string>
 </resources>
