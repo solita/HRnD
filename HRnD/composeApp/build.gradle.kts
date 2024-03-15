@@ -22,7 +22,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = false
+            isStatic = true
         }
     }
 
@@ -57,6 +57,7 @@ kotlin {
             implementation(libs.kamel)
             implementation(libs.koin.core)
             implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screen.model)
             implementation(libs.voyager.koin)
             implementation(libs.voyager.transitions)
 

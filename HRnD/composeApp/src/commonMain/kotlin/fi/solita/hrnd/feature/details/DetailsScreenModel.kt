@@ -15,7 +15,7 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 
 class DetailsScreenModel(
-    private val patientInfo: PatientInfo?,
+    patientInfo: PatientInfo?,
     private val healthRepository: HealthRepository
 ) : ContainerHost<DetailsScreenState, DetailsScreenSideEffect>, ScreenModel {
 
@@ -26,21 +26,44 @@ class DetailsScreenModel(
     override val container: Container<DetailsScreenState, DetailsScreenSideEffect> =
         screenModelScope.container(DetailsScreenState(patientInfo))
 
-    fun fetchPatientDetails() = intent {
-        Napier.i { "fetchPatientDetails" }
-        if (patientInfo?.patientId == null) {
+    private fun screenInitialized(patientInfo: PatientInfo?, patientId: String?) = intent {
+        if (patientId == null && patientInfo == null) {
             reduce {
-                state.copy(error = DetailsScreenError.PatientIdMissing)
+                state.copy(
+                    error = DetailsScreenError.PatientDataMissing
+                )
             }
-        } else {
-            screenModelScope.launch {
-                healthRepository.fetchPatientDetails(patientInfo.patientId).collect {
+            return@intent
+        }
+
+        if (patientInfo == null) {
+            fetchPatientInfo(patientId)
+        }
+        fetchPatientDetails(patientId ?: patientInfo?.patientId)
+    }
+
+    private fun fetchPatientInfo(patientId: String?) = intent {
+        Napier.i { "fetchPatientInfo $patientId" }
+        val fetchedPatientInfo = patientId?.let {
+            healthRepository.fetchPatientInfo(patientId)
+        }
+        reduce {
+            state.copy(patientInfo = fetchedPatientInfo)
+        }
+    }
+
+    private fun fetchPatientDetails(patientId: String?) = intent {
+        if (patientId == null){
+            return@intent
+        }
+        Napier.i { "fetchPatientDetails" }
+        screenModelScope.launch {
+                healthRepository.fetchPatientDetails(patientId).collect {
                     reduce {
                         state.copy(
                             patientDetails = it.toDomainPatientDetails(),
                             patientDetailsFetched = true
                         )
-                    }
                 }
             }
         }
@@ -53,8 +76,13 @@ class DetailsScreenModel(
     }
 
     fun handleEvent(event: DetailsScreenEvent) {
+        Napier.i { "handleEvent $event" }
         when (event) {
             DetailsScreenEvent.ErrorDismissed -> errorDismissed()
+            is DetailsScreenEvent.ScreenInitialized -> screenInitialized(
+                event.patientInfo,
+                event.patientId
+            )
         }
     }
 }
@@ -69,9 +97,11 @@ data class DetailsScreenState(
 sealed class DetailsScreenSideEffect
 
 sealed class DetailsScreenError : Error() {
-    data object PatientIdMissing : DetailsScreenError()
+    data object PatientDataMissing : DetailsScreenError()
 }
 
 sealed class DetailsScreenEvent {
     data object ErrorDismissed : DetailsScreenEvent()
+    data class ScreenInitialized(val patientInfo: PatientInfo?, val patientId: String?) :
+        DetailsScreenEvent()
 }

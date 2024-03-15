@@ -49,7 +49,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.parameter.parametersOf
 
-class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
+class DetailsScreen(private val patientInfo: PatientInfo?,private val patientId: String? = null) : Screen {
 
     @Composable
     override fun Content() {
@@ -59,162 +59,173 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
 
         LaunchedEffect(patientInfo) {
             if (!state.patientDetailsFetched) {
-                screenModel.fetchPatientDetails()
+                screenModel.handleEvent(
+                    DetailsScreenEvent.ScreenInitialized(
+                        patientInfo,
+                        patientId
+                    )
+                )
             }
         }
 
         BuildContent(state)
     }
+}
 
-    @OptIn(ExperimentalResourceApi::class)
-    @Composable
-    fun BuildContent(state: DetailsScreenState = DetailsScreenState(patientInfo)) {
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun BuildContent(state: DetailsScreenState) {
 
-        val primaryColor = MaterialTheme.colors.primary
-        val secondaryColor = MaterialTheme.colors.secondary
-        val navigator = LocalNavigator.current
+    val primaryColor = MaterialTheme.colors.primary
+    val secondaryColor = MaterialTheme.colors.secondary
+    val navigator = LocalNavigator.current
 
-        Column(
-            Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        NavigationElement(
+            previousScreenTitle = stringResource(Res.string.nav_list),
+            modifier = Modifier.fillMaxWidth()
         ) {
+            navigator?.pop()
+        }
 
-            NavigationElement(
-                previousScreenTitle = stringResource(Res.string.nav_list),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                navigator?.pop()
-            }
+        if (state.patientInfo != null) {
+            Spacer(Modifier.height(16.dp))
+            Text(state.patientInfo.fullName, style = MaterialTheme.typography.h1)
+            Spacer(Modifier.height(18.dp))
+            GenderAndAgeRow(
+                gender = state.patientInfo.gender,
+                dateOfBirth = state.patientInfo.dateOfBirth,
+                size = GenderAndAgeRowSize.BIG
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                stringResource(Res.string.patient_id, state.patientInfo.patientId),
+                style = MaterialTheme.typography.caption
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = stringResource(Res.string.current_status),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.h2
+            )
+            Spacer(Modifier.height(16.dp))
 
-            if (patientInfo != null) {
-                Spacer(Modifier.height(16.dp))
-                Text(patientInfo.fullName, style = MaterialTheme.typography.h1)
-                Spacer(Modifier.height(18.dp))
-                GenderAndAgeRow(
-                    gender = patientInfo.gender,
-                    dateOfBirth = patientInfo.dateOfBirth,
-                    size = GenderAndAgeRowSize.BIG
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    stringResource(Res.string.patient_id, patientInfo.patientId),
-                    style = MaterialTheme.typography.caption
-                )
-                Spacer(Modifier.height(16.dp))
-                Text(
-                    text = stringResource(Res.string.current_status),
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.h2
-                )
-                Spacer(Modifier.height(16.dp))
+            CurrentStatusCard(
+                modifier = Modifier,
+                placement = state.patientInfo.currentRoom,
+                currentMedication = state.patientDetails?.medication ?: persistentListOf(),
+                currentDiagnosis = state.patientInfo.currentDiagnosis?.toImmutableList()
+                    ?: persistentListOf()
+            )
 
-                CurrentStatusCard(
-                    modifier = Modifier,
-                    placement = state.patientInfo?.currentRoom,
-                    currentMedication = state.patientDetails?.medication ?: persistentListOf(),
-                    currentDiagnosis = state.patientInfo?.currentDiagnosis?.toImmutableList()
-                        ?: persistentListOf()
-                )
+            Spacer(Modifier.height(16.dp))
 
-                Spacer(Modifier.height(16.dp))
-
-                // Heart rate and Blood pressure section
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Column(Modifier.weight(0.5f)) {
-                        Text(stringResource(Res.string.heart_rate), style = MaterialTheme.typography.h2)
-                        MyMiniChart(
-                            data = persistentListOf(
-                                state.patientDetails?.mostRecentDayHeartRate?.copy(
-                                    color = primaryColor
-                                )
-                            ).filterNotNull().toImmutableList(),
-                            onclick = {
-                                navigator?.push(
-                                    DetailedChartScreen(
-                                        persistentListOf(
-                                            state.patientDetails?.fullHeartRate?.copy(
-                                                color = primaryColor
-                                            )
-                                        ).filterNotNull().toTypedArray(),
-                                        mostRecentDayOfRecordedDataEpoch =
-                                        state.patientDetails?.mostRecentDayHeartRate?.getMostRecentDay()
-                                            ?.toEpochDays() ?: Int.MAX_VALUE
-                                    )
-                                )
-                            }
-                        )
-                    }
-                    Spacer(Modifier.width(16.dp))
-                    Column(Modifier.weight(0.5f)) {
-                        Text(stringResource(Res.string.blood_pressure), style = MaterialTheme.typography.h2)
-                        MyMiniChart(
-                            data = persistentListOf(
-                                state.patientDetails?.mostRecentDaySystolicPressure?.copy(
-                                    color = primaryColor
-                                ),
-                                state.patientDetails?.mostRecentDayDiastolicPressure?.copy(
-                                    color = secondaryColor
-                                )
-                            ).filterNotNull().toImmutableList(),
-                            onclick = {
-                                val mostRecentDayOfRecordedSystolicPressure =
-                                    state.patientDetails?.mostRecentDaySystolicPressure?.getMostRecentDay()
-                                        ?.toEpochDays()
-                                val mostRecentDayOfRecordedDiastolicPressure =
-                                    state.patientDetails?.mostRecentDayDiastolicPressure?.getMostRecentDay()
-                                        ?.toEpochDays()
-                                navigator?.push(
-                                    DetailedChartScreen(
-                                        persistentListOf(
-                                            state.patientDetails?.fullSystolicPressure?.copy(
-                                                color = primaryColor
-                                            ),
-                                            state.patientDetails?.fullDiastolicPressure?.copy(
-                                                color = secondaryColor
-                                            )
-                                        ).filterNotNull().toTypedArray(),
-                                        mostRecentDayOfRecordedDataEpoch = maxOf(
-                                            mostRecentDayOfRecordedDiastolicPressure
-                                                ?: Int.MAX_VALUE,
-                                            mostRecentDayOfRecordedSystolicPressure ?: Int.MAX_VALUE
-                                        )
-                                    )
-                                )
-                            }
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                // Medical History Section
-                Text(
-                    text = stringResource(Res.string.medical_history),
-                    style = MaterialTheme.typography.h2,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                )
-                Spacer(Modifier.height(16.dp))
-                if (state.patientDetails?.surgery != null) {
-                    if (state.patientDetails.surgery.isEmpty()) {
-                        Text(stringResource(Res.string.no_medical_history))
-                    } else {
-                        state.patientDetails.surgery.forEach { surgery ->
-                            MedicalHistoryItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                surgery = surgery
+            // Heart rate and Blood pressure section
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Column(Modifier.weight(0.5f)) {
+                    Text(
+                        stringResource(Res.string.heart_rate),
+                        style = MaterialTheme.typography.h2
+                    )
+                    MyMiniChart(
+                        data = persistentListOf(
+                            state.patientDetails?.mostRecentDayHeartRate?.copy(
+                                color = primaryColor
                             )
-                            Spacer(Modifier.height(8.dp))
+                        ).filterNotNull().toImmutableList(),
+                        onclick = {
+                            navigator?.push(
+                                DetailedChartScreen(
+                                    persistentListOf(
+                                        state.patientDetails?.fullHeartRate?.copy(
+                                            color = primaryColor
+                                        )
+                                    ).filterNotNull().toTypedArray(),
+                                    mostRecentDayOfRecordedDataEpoch =
+                                    state.patientDetails?.mostRecentDayHeartRate?.getMostRecentDay()
+                                        ?.toEpochDays() ?: Int.MAX_VALUE
+                                )
+                            )
                         }
-                    }
-                } else {
-                    NoDataAvailable()
+                    )
                 }
-
-            } else {
-                NoDataAvailable(Modifier.fillMaxSize())
+                Spacer(Modifier.width(16.dp))
+                Column(Modifier.weight(0.5f)) {
+                    Text(
+                        stringResource(Res.string.blood_pressure),
+                        style = MaterialTheme.typography.h2
+                    )
+                    MyMiniChart(
+                        data = persistentListOf(
+                            state.patientDetails?.mostRecentDaySystolicPressure?.copy(
+                                color = primaryColor
+                            ),
+                            state.patientDetails?.mostRecentDayDiastolicPressure?.copy(
+                                color = secondaryColor
+                            )
+                        ).filterNotNull().toImmutableList(),
+                        onclick = {
+                            val mostRecentDayOfRecordedSystolicPressure =
+                                state.patientDetails?.mostRecentDaySystolicPressure?.getMostRecentDay()
+                                    ?.toEpochDays()
+                            val mostRecentDayOfRecordedDiastolicPressure =
+                                state.patientDetails?.mostRecentDayDiastolicPressure?.getMostRecentDay()
+                                    ?.toEpochDays()
+                            navigator?.push(
+                                DetailedChartScreen(
+                                    persistentListOf(
+                                        state.patientDetails?.fullSystolicPressure?.copy(
+                                            color = primaryColor
+                                        ),
+                                        state.patientDetails?.fullDiastolicPressure?.copy(
+                                            color = secondaryColor
+                                        )
+                                    ).filterNotNull().toTypedArray(),
+                                    mostRecentDayOfRecordedDataEpoch = maxOf(
+                                        mostRecentDayOfRecordedDiastolicPressure
+                                            ?: Int.MAX_VALUE,
+                                        mostRecentDayOfRecordedSystolicPressure ?: Int.MAX_VALUE
+                                    )
+                                )
+                            )
+                        }
+                    )
+                }
             }
+
+            Spacer(Modifier.height(16.dp))
+
+            // Medical History Section
+            Text(
+                text = stringResource(Res.string.medical_history),
+                style = MaterialTheme.typography.h2,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start,
+            )
+            Spacer(Modifier.height(16.dp))
+            if (state.patientDetails?.surgery != null) {
+                if (state.patientDetails.surgery.isEmpty()) {
+                    Text(stringResource(Res.string.no_medical_history))
+                } else {
+                    state.patientDetails.surgery.forEach { surgery ->
+                        MedicalHistoryItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            surgery = surgery
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
+            } else {
+                NoDataAvailable()
+            }
+
+        } else {
+            NoDataAvailable(modifier = Modifier.fillMaxSize(), text = "Patient not found")
         }
     }
 }
@@ -222,5 +233,5 @@ class DetailsScreen(val patientInfo: PatientInfo?) : Screen {
 @Preview
 @Composable
 private fun BuildContentPreview() {
-    DetailsScreen(patientInfo = PreviewUtil.mockPatientInfo).BuildContent()
+    BuildContent(state = DetailsScreenState(PreviewUtil.mockPatientInfo))
 }

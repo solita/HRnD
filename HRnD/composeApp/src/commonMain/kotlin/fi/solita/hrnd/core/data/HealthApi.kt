@@ -1,14 +1,22 @@
 package fi.solita.hrnd.core.data
 
-import fi.solita.hrnd.core.data.model.*
+import fi.solita.hrnd.core.data.model.HeartRate
+import fi.solita.hrnd.core.data.model.MedicalHistory
+import fi.solita.hrnd.core.data.model.Medication
+import fi.solita.hrnd.core.data.model.PatientInfo
+import fi.solita.hrnd.core.data.model.Pressure
+import fi.solita.hrnd.core.data.model.Surgery
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.utils.io.CancellationException
 
 interface HealthApi {
     suspend fun fetchPatientsData(): List<PatientInfo>
+    suspend fun fetchPatientInfo(patientId: String): PatientInfo?
 
     suspend fun fetchPatientMedication(patientId: String): List<Medication>
     suspend fun fetchPatientHeartRate(patientId: String): List<HeartRate>
@@ -31,6 +39,18 @@ class KtorHealthApi(private val client: HttpClient) : HealthApi {
             if (e is CancellationException) throw e
             e.printStackTrace()
             listOf()
+        }
+    }
+
+    override suspend fun fetchPatientInfo(patientId: String): PatientInfo? {
+        return try {
+            client.get("$API_URL/get_patient"){
+                withPatientId(patientId)
+            }.body<PatientInfo?>()
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            e.printStackTrace()
+            null
         }
     }
 

@@ -14,6 +14,17 @@ app.get("/get_patients", (req, res) => {
   res.send(dataObject)
 });
 
+app.get("/get_patient", (req, res) => {
+  let path = "data/patient.json"
+  let data = fs.readFileSync(path)
+  var dataObject = JSON.parse(data)
+  let patientId = req.query.patient_id;
+  let patient = dataObject.find(patient => patient.patient_id === patientId);
+
+  console.log(patient)
+  res.send(patient)
+});
+
 app.get("/get_patient_medication", (req, res) => {
   let path = "data/medication.json"
   let data = fs.readFileSync(path)

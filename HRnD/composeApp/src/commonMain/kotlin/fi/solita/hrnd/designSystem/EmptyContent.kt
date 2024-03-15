@@ -22,9 +22,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun NoDataAvailable(modifier: Modifier = Modifier) {
+fun NoDataAvailable(modifier: Modifier = Modifier, text: String? = null) {
     Box(modifier, contentAlignment = Alignment.Center) {
-        Text(stringResource(Res.string.no_data_available))
+        Text(text ?: stringResource(Res.string.no_data_available))
     }
 }
 

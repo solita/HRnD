@@ -10,6 +10,8 @@ interface HealthRepository {
 
     suspend fun fetchPatients()
 
+    suspend fun fetchPatientInfo(id: String) : PatientInfo?
+
     suspend fun fetchPatientDetails(patientId: String): Flow<PatientDetails>
 }
 
@@ -25,6 +27,10 @@ class HealthRepositoryImpl(
         _patients.update {
             healthApi.fetchPatientsData()
         }
+    }
+
+    override suspend fun fetchPatientInfo(id: String): PatientInfo? {
+        return healthApi.fetchPatientInfo(patientId = id)
     }
 
     override suspend fun fetchPatientDetails(patientId: String): Flow<PatientDetails> = channelFlow {

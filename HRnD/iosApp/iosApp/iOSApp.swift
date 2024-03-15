@@ -4,6 +4,7 @@ import ComposeApp
 @main
 struct iOSApp: App {
     init() {
+        ScannerFactoryCompanion().shared = TheFactory()
         KoinKt.doInitKoin()
     }
 

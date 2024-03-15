@@ -29,7 +29,7 @@ fun NavigationElement(
     onClick: () -> Unit
 ) {
     Row(
-        modifier.height(22.dp),
+        modifier.height(28.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start
     ) {
