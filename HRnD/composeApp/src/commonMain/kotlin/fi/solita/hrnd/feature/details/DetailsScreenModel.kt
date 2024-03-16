@@ -4,7 +4,6 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import fi.solita.hrnd.core.data.HealthRepository
 import fi.solita.hrnd.core.data.model.PatientInfo
-import fi.solita.hrnd.domain.PatientDetails
 import fi.solita.hrnd.domain.utils.toDomainPatientDetails
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.launch
@@ -17,13 +16,9 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 class DetailsScreenModel(
     patientInfo: PatientInfo?,
     private val healthRepository: HealthRepository
-) : ContainerHost<DetailsScreenState, DetailsScreenSideEffect>, ScreenModel {
+) : ContainerHost<DetailsScreenState, Nothing>, ScreenModel {
 
-    init {
-        Napier.i { "init DetailsScreenModel" }
-    }
-
-    override val container: Container<DetailsScreenState, DetailsScreenSideEffect> =
+    override val container: Container<DetailsScreenState, Nothing> =
         screenModelScope.container(DetailsScreenState(patientInfo))
 
     private fun screenInitialized(patientInfo: PatientInfo?, patientId: String?) = intent {
@@ -85,23 +80,4 @@ class DetailsScreenModel(
             )
         }
     }
-}
-
-data class DetailsScreenState(
-    val patientInfo: PatientInfo?,
-    val patientDetailsFetched: Boolean = false,
-    val patientDetails: PatientDetails? = null,
-    val error: DetailsScreenError? = null
-)
-
-sealed class DetailsScreenSideEffect
-
-sealed class DetailsScreenError : Error() {
-    data object PatientDataMissing : DetailsScreenError()
-}
-
-sealed class DetailsScreenEvent {
-    data object ErrorDismissed : DetailsScreenEvent()
-    data class ScreenInitialized(val patientInfo: PatientInfo?, val patientId: String?) :
-        DetailsScreenEvent()
 }
