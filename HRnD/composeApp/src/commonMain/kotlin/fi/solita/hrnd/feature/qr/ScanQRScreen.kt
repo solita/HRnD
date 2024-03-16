@@ -9,6 +9,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import fi.solita.hrnd.designSystem.NavigationElement
+import fi.solita.hrnd.domain.utils.Platform
+import fi.solita.hrnd.domain.utils.getPlatform
 import fi.solita.hrnd.feature.details.DetailsScreen
 import hrnd.composeapp.generated.resources.Res
 import hrnd.composeapp.generated.resources.nav_list
@@ -22,11 +24,14 @@ class ScanQRScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         Column {
-            NavigationElement(
-                modifier = Modifier.padding(16.dp),
-                previousScreenTitle = stringResource(Res.string.nav_list)
-            ) {
-                navigator.pop()
+            // In android we don't want even a spacer on top.
+            if (getPlatform() == Platform.iOS) {
+                NavigationElement(
+                    modifier = Modifier.padding(16.dp),
+                    previousScreenTitle = stringResource(Res.string.nav_list)
+                ) {
+                    navigator.pop()
+                }
             }
             Scanner {
                 navigator.push(DetailsScreen(patientInfo = null, patientId = it))

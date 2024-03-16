@@ -42,6 +42,8 @@ kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotl
 kotest-assert = { module = "io.kotest:kotest-assertions-core", version = "5.8.0" }
 kotlin-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.7"}
 
+zxing = { module = "com.journeyapps:zxing-android-embedded",version = "4.3.0" }
+
 kotlin-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines"}
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
 shimmer = {module = "com.valentinilk.shimmer:compose-shimmer",version = "1.2.0"}
