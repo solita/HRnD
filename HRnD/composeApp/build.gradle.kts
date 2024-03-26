@@ -37,6 +37,15 @@ kotlin {
                 implementation(libs.ktor.client.okhttp)
 
                 implementation(libs.zxing)
+
+                implementation(libs.profiler)
+            }
+        }
+
+        androidNativeTest{
+            dependencies {
+                implementation(libs.kotlin.test)
+                implementation(libs.profiler)
             }
         }
 
@@ -116,11 +125,20 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isDebuggable = false
+            isShrinkResources = true
             resValue("string", "app_name", "Health Rundown")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("debug") // Uncomment this line to enable signing
         }
 
         getByName("debug"){
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
             resValue("string", "app_name", "Health Debug")
         }
 
@@ -137,8 +155,23 @@ android {
 
             signingConfig = signingConfigs.getByName("debug")
 
-            applicationIdSuffix = ".debug"
+            applicationIdSuffix = ".demo"
             resValue("string", "app_name", "Health Rundown Demo")
+        }
+
+        create("benchmark"){
+            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            isDebuggable = false
+            isShrinkResources = true
+
+            applicationIdSuffix = ".benchmark"
+
+            resValue("string", "app_name", "Health Benchmark")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "benchmark-rules.pro"
+            )
         }
     }
     compileOptions {

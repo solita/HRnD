@@ -30,9 +30,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,6 +54,7 @@ import fi.solita.hrnd.designSystem.theme.Typography
 import fi.solita.hrnd.feature.details.DetailsScreen
 import fi.solita.hrnd.feature.list.composables.PatientInfoCard
 import fi.solita.hrnd.feature.qr.ScanQRScreen
+import fi.solita.hrnd.utils.enableTestTagAsResId
 import hrnd.composeapp.generated.resources.Res
 import hrnd.composeapp.generated.resources.patients
 import hrnd.composeapp.generated.resources.scan_qr_fab
@@ -55,6 +62,7 @@ import hrnd.composeapp.generated.resources.scan_qr_fab_desc
 import hrnd.composeapp.generated.resources.search_icon_desc
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -67,7 +75,6 @@ data object ListScreen : Screen {
         val screenModel: ListScreenModel = getScreenModel()
 
         val sideEffect = screenModel.container.sideEffectFlow.collectAsState(null)
-
 
         LaunchedEffect(sideEffect.value) {
             Napier.i { "launchEffect ${sideEffect.value}" }
@@ -92,11 +99,16 @@ data object ListScreen : Screen {
             screenModel.fetchPatients()
         }
 
-        val state by screenModel.container.stateFlow.collectAsState()
+        val state by screenModel.container.stateFlow.collectAsState(Dispatchers.Main.immediate)
+        val text = screenModel.text
 
         BuildContent(
             state,
-            Modifier,
+            text,
+            { screenModel.onSearchUpdate(it) },
+            Modifier.semantics {
+                testTag = "ListScreen"
+            },
             screenModel::handleEvent
         )
     }
@@ -105,19 +117,23 @@ data object ListScreen : Screen {
     @Composable
     fun BuildContent(
         state: ListScreenState,
+        text: String,
+        onSearchUpdate: (String) -> Unit,
         modifier: Modifier = Modifier,
         onEvent: (ListScreenEvent) -> Unit
     ) {
+
         val pullRefreshState = rememberPullRefreshState(
             onRefresh = { onEvent(ListScreenEvent.Refresh) },
             refreshing = state.isBusy
         )
         Box(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize().enableTestTagAsResId(),
             contentAlignment = Alignment.Center
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
+                    .testTag("patient_list")
                     .pullRefresh(pullRefreshState),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -134,8 +150,8 @@ data object ListScreen : Screen {
                 item {
                     TextField(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                        value = state.patientSearchKeyWord,
-                        onValueChange = { onEvent(ListScreenEvent.SearchUpdate(it)) },
+                        value = text,
+                        onValueChange = { onSearchUpdate(it) },
                         maxLines = 1,
                         keyboardOptions = KeyboardOptions(
                             autoCorrect = false,
@@ -181,7 +197,7 @@ data object ListScreen : Screen {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     ExtendedFloatingActionButton(
-                        modifier = Modifier.padding(32.dp),
+                        modifier = Modifier.padding(32.dp).testTag("fab_qr"),
                         onClick = { onEvent(ListScreenEvent.FabClicked) },
                         icon = {
                             Icon(
@@ -202,7 +218,7 @@ data object ListScreen : Screen {
 private fun ListScreenPreview() {
     HrndTheme {
         Surface {
-            ListScreen.BuildContent(state = listScreenMockState, onEvent = {})
+            ListScreen.BuildContent(state = listScreenMockState,"", {}, onEvent = {})
         }
     }
 }
@@ -212,5 +228,4 @@ val listScreenMockState = ListScreenState(
         PatientInfo("1", "Michal", "Guspiel", "9/18/1997", currentRoom = null),
         PatientInfo("1", "Johh", "Doe", "1/29/1979", currentRoom = "12"),
     ),
-    patientSearchKeyWord = ""
 )

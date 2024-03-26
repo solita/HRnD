@@ -29,12 +29,13 @@ interface HealthApi {
 class KtorHealthApi(private val client: HttpClient) : HealthApi {
     companion object {
         private const val API_URL =
-            "http://localhost:8090"
+            "http://192.168.1.107:8090"
     }
 
     override suspend fun fetchPatientsData(): List<PatientInfo> {
         return try {
-            client.get("$API_URL/get_patients").body()
+        Napier.i { "Fetching patients using $API_URL" }
+        client.get("$API_URL/get_patients").body()
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             e.printStackTrace()
