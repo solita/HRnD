@@ -30,9 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -62,7 +59,6 @@ import hrnd.composeapp.generated.resources.scan_qr_fab_desc
 import hrnd.composeapp.generated.resources.search_icon_desc
 import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -74,7 +70,8 @@ data object ListScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: ListScreenModel = getScreenModel()
 
-        val sideEffect = screenModel.container.sideEffectFlow.collectAsState(null)
+        val sideEffect = screenModel.sideEffect.collectAsState(null)
+        val state by screenModel.state.collectAsState()
 
         LaunchedEffect(sideEffect.value) {
             Napier.i { "launchEffect ${sideEffect.value}" }
@@ -95,17 +92,8 @@ data object ListScreen : Screen {
             }
         }
 
-        LaunchedEffect(Unit) {
-            screenModel.fetchPatients()
-        }
-
-        val state by screenModel.container.stateFlow.collectAsState(Dispatchers.Main.immediate)
-        val text = screenModel.text
-
         BuildContent(
             state,
-            text,
-            { screenModel.onSearchUpdate(it) },
             Modifier.semantics {
                 testTag = "ListScreen"
             },
@@ -117,8 +105,6 @@ data object ListScreen : Screen {
     @Composable
     fun BuildContent(
         state: ListScreenState,
-        text: String,
-        onSearchUpdate: (String) -> Unit,
         modifier: Modifier = Modifier,
         onEvent: (ListScreenEvent) -> Unit
     ) {
@@ -150,8 +136,8 @@ data object ListScreen : Screen {
                 item {
                     TextField(
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                        value = text,
-                        onValueChange = { onSearchUpdate(it) },
+                        value = state.searchKeyWord,
+                        onValueChange = { onEvent(ListScreenEvent.SearchUpdate(it)) },
                         maxLines = 1,
                         keyboardOptions = KeyboardOptions(
                             autoCorrect = false,
@@ -218,7 +204,7 @@ data object ListScreen : Screen {
 private fun ListScreenPreview() {
     HrndTheme {
         Surface {
-            ListScreen.BuildContent(state = listScreenMockState,"", {}, onEvent = {})
+            ListScreen.BuildContent(state = listScreenMockState, onEvent = {})
         }
     }
 }

@@ -6,4 +6,5 @@ sealed class ListScreenEvent {
     data object FabClicked : ListScreenEvent()
     data class PatientClicked(val patientInfo: PatientInfo) : ListScreenEvent()
     data object Refresh : ListScreenEvent()
+    data class SearchUpdate(val keyWord: String) : ListScreenEvent()
 }

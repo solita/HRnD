@@ -1,8 +1,5 @@
 package fi.solita.hrnd.feature.list
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import fi.solita.hrnd.core.data.HealthRepository
@@ -11,40 +8,34 @@ import io.github.aakira.napier.Napier
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.orbitmvi.orbit.Container
-import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.annotation.OrbitExperimental
-import org.orbitmvi.orbit.annotation.OrbitInternal
-import org.orbitmvi.orbit.container
-import org.orbitmvi.orbit.syntax.simple.blockingIntent
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 
 class ListScreenModel(
     private val healthRepository: HealthRepository
-) : ContainerHost<ListScreenState, ListScreenSideEffect>, ScreenModel {
+) : ScreenModel {
 
-    override val container: Container<ListScreenState, ListScreenSideEffect> =
-        screenModelScope.container(ListScreenState())
 
-    var text by mutableStateOf("")
-        private set
+    private val _state = MutableStateFlow(ListScreenState())
+    val state = _state.asStateFlow()
 
-    fun fetchPatients() = intent {
-        healthRepository.fetchPatients()
+    private val _sideEffect = Channel<ListScreenSideEffect>()
+    val sideEffect = _sideEffect.receiveAsFlow()
+
+    fun fetchPatients() {
         screenModelScope.launch {
-            healthRepository.patients.collect {
-                reduce {
-                    state.copy(
-                        patients = it.filterPatientInfo(text),
+            healthRepository.fetchPatients()
+            healthRepository.patients.collect { patients ->
+                _state.update { state ->
+                    _state.value.copy(
+                        patients = patients.filterPatientInfo(state.searchKeyWord),
                         isBusy = false
                     )
                 }
@@ -52,43 +43,60 @@ class ListScreenModel(
         }
     }
 
-    fun onSearchUpdate(searchKeyWord: String) {
-        text = searchKeyWord
-
-        intent {
-            reduce {
-                state.copy(
-                    patients =
-                    healthRepository
-                        .patients
-                        .value
-                        .filterPatientInfo(text),
-                )
-            }
+    private fun onSearchUpdate(searchKeyWord: String) {
+        _state.update {
+            _state.value.copy(
+                searchKeyWord = searchKeyWord,
+            )
         }
     }
 
-    private fun onPatientClicked(patientInfo: PatientInfo) = intent {
-        postSideEffect(ListScreenSideEffect.NavigateToPatient(patientInfo))
+    private fun onPatientClicked(patientInfo: PatientInfo) {
+        screenModelScope.launch {
+            _sideEffect.send(ListScreenSideEffect.NavigateToPatient(patientInfo))
+        }
     }
 
-    private fun onFabClicked() = intent {
-        postSideEffect(ListScreenSideEffect.NavigateToQRScreen)
+    private fun onFabClicked() {
+        screenModelScope.launch {
+            _sideEffect.send(ListScreenSideEffect.NavigateToQRScreen)
+        }
     }
 
     private fun List<PatientInfo>.filterPatientInfo(keyWord: String?): ImmutableList<PatientInfo> {
         if (keyWord == null) return this.toImmutableList()
         return this.filter { patientInfo ->
-            val fullName = "${patientInfo.firstName.orEmpty()} ${patientInfo.lastName.orEmpty()}"
+            val fullName =
+                "${patientInfo.firstName.orEmpty()} ${patientInfo.lastName.orEmpty()}"
             fullName.contains(keyWord, ignoreCase = true)
         }.toImmutableList()
     }
 
     fun handleEvent(event: ListScreenEvent) {
         when (event) {
-            ListScreenEvent.FabClicked -> onFabClicked()
+            is ListScreenEvent.SearchUpdate -> onSearchUpdate(event.keyWord)
             is ListScreenEvent.PatientClicked -> onPatientClicked(event.patientInfo)
             is ListScreenEvent.Refresh -> fetchPatients()
+            ListScreenEvent.FabClicked -> onFabClicked()
+        }
+    }
+
+    init {
+        Napier.i { "Init screen model!" }
+        fetchPatients()
+        debounceSearch()
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun debounceSearch() {
+        screenModelScope.launch {
+            _state.map { it.searchKeyWord }.debounce(500).collectLatest {searchKeyWord ->
+                _state.update {
+                    _state.value.copy(
+                        patients = healthRepository.patients.value.filterPatientInfo(searchKeyWord)
+                    )
+                }
+            }
         }
     }
 }

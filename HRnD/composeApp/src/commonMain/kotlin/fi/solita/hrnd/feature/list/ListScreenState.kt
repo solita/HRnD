@@ -7,4 +7,5 @@ import kotlinx.collections.immutable.persistentListOf
 data class ListScreenState(
     val isBusy: Boolean = false,
     val patients: ImmutableList<PatientInfo> = persistentListOf(),
+    val searchKeyWord : String = ""
 )
